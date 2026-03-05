@@ -10,12 +10,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 const MEDICINE_CARD_WIDTH = (width - 40) / 2 - 8;
 
 export default function BuyAgainScreen() {
   const [cartCount, setCartCount] = useState(0);
+  const router = useRouter();
 
   const medicines = [
     { id: 1, name: 'Walaphage 850 Tablet 15\'s', price: 3.6, oldPrice: 4.0, discount: 10, delivery: '11:30 PM' },
@@ -50,7 +52,7 @@ export default function BuyAgainScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" />
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Buy Again</Text>
