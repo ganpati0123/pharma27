@@ -1,3 +1,40 @@
+/**
+ * ============================================================================
+ * APOLLO 24/7 ROYAL PREMIUM HOME SCREEN
+ * ============================================================================
+ * 
+ * A luxury healthcare super-app home screen built with the precision and
+ * polish of a FAANG principal architect. Every pixel, every animation,
+ * every micro-interaction has been crafted to deliver a royal, premium
+ * experience that feels like liquid gold flowing through the user's fingers.
+ * 
+ * Architecture:
+ * - Modular section-based composition
+ * - React.memo on all components for 60fps performance
+ * - Reanimated worklet-based animations
+ * - FlatList virtualization for heavy lists
+ * - 8px spacing grid system throughout
+ * - Soft purple + gold accent shadow system
+ * 
+ * Sections (top to bottom):
+ * 1. StickyHeader - Namaste greeting, location, wallet, profile
+ * 2. SearchBar - Premium rounded search with AI assistant badge
+ * 3. CategoryNav - Horizontal scrollable chips with gold underline
+ * 4. HeroSection - Trust messaging with legacy brand logos
+ * 5. ServicesGrid - 2x2 premium service cards
+ * 6. PrescriptionBar - Rx order banner with ripple button
+ * 7. BuyAgainSection - Tabs + horizontal medicine cards
+ * 8. BankOffersCarousel - Auto-scrolling bank offer cards
+ * 9. CuratedOfferings - 3 vertical premium offering cards
+ * 10. PromotionBanners - Auto-scrolling promotional banners
+ * 11. ContentCards - Apollo 24|7 + PRO Health cards
+ * 12. AskApolloCarousel - 14 health topic poster cards
+ * 13. TrustBadges - Gold seal trust indicators
+ * 14. Footer - Version, branding, powered-by
+ * 
+ * ============================================================================
+ */
+
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
@@ -7,1073 +44,914 @@ import {
   TouchableOpacity,
   FlatList,
   Dimensions,
-  Animated,
-  Image,
+  Platform,
   StatusBar,
   SafeAreaView,
-  LinearGradient,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedScrollHandler,
+  withTiming,
+  withSpring,
+  withDelay,
+  withSequence,
+  withRepeat,
+  interpolate,
+  Easing,
+  Extrapolation,
+  FadeIn,
+  FadeInDown,
+} from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 
-const { width, height } = Dimensions.get('window');
-const CARD_WIDTH = 160;
-const MEDICINE_CARD_WIDTH = 100;
-const MEDICINE_CARD_HEIGHT = 140;
+// Section Components
+import { HeroSection, ServicesGrid, PrescriptionBar } from '../components/home/HeroAndServices';
+import { BuyAgainHeader, MedicineCarousel, BankOffersCarousel } from '../components/home/ShoppingSection';
+import { CuratedOfferings, PromotionBanners, ContentCards, AskApolloCarousel, TrustBadges, Footer } from '../components/home/DiscoverSection';
+import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, ANIMATION, LAYOUT, MIXINS, DATA } from '../components/home/theme';
 
-export default function HomeScreen() {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [cartCount, setCartCount] = useState(0);
-  const scrollX = useRef(new Animated.Value(0)).current;
-  const bankScrollX = useRef(new Animated.Value(0)).current;
-  const posterScrollX = useRef(new Animated.Value(0)).current;
-  const bannerScrollX = useRef(new Animated.Value(0)).current;
-  const medicineScrollX = useRef(new Animated.Value(0)).current;
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-  const categories = [
-    'All', 'Skin', 'Summer', 'Women', 'Health Check', 'Men', 'Insurance',
-    'Weight Loss', 'Nutrition', 'Instant Dr', 'Sexual Health'
-  ];
-
-  const services = [
-    { id: 1, title: 'Apollo Pharmacy', icon: 'medkit', offer: 'Up to 25% OFF', color: '#00A651' },
-    { id: 2, title: 'Lab Tests At Home', icon: 'flask', offer: 'Starting ₹299', color: '#FF6B35' },
-    { id: 3, title: 'Doctor Consultation', icon: 'person', offer: 'From ₹199', color: '#FFD700' },
-    { id: 4, title: 'Apollo Insurance', icon: 'shield', offer: 'Save up to 40%', color: '#00A651' },
-  ];
-
-  const medicines = [
-    { id: 1, name: 'Walaphage 850 Tablet 15\'s', price: 3.6, oldPrice: 4.0, discount: 10, delivery: '11:30 PM' },
-    { id: 2, name: 'Dolo 650 Tablet 15\'s', price: 2.8, oldPrice: 3.5, discount: 20, delivery: '10:30 PM' },
-    { id: 3, name: 'Augmentin 625 Duo Tablet 10\'s', price: 15.2, oldPrice: 18.9, discount: 19, delivery: '12:00 AM' },
-    { id: 4, name: 'Cetrizine 10mg Tablet 10\'s', price: 1.2, oldPrice: 1.5, discount: 20, delivery: '9:30 PM' },
-    { id: 5, name: 'Paracetamol 500mg Tablet 10\'s', price: 0.8, oldPrice: 1.0, discount: 20, delivery: '8:30 PM' },
-  ];
-
-  const banks = [
-    { id: 1, name: 'SBI', color: '#0047A3' },
-    { id: 2, name: 'HDFC', color: '#0052A4' },
-    { id: 3, name: 'ICICI', color: '#F47920' },
-    { id: 4, name: 'Axis', color: '#7B2CBF' },
-    { id: 5, name: 'Kotak', color: '#E31837' },
-    { id: 6, name: 'Yes Bank', color: '#005EB8' },
-    { id: 7, name: 'PNB', color: '#0066B2' },
-    { id: 8, name: 'BOB', color: '#ED1C24' },
-    { id: 9, name: 'Union Bank', color: '#FF6B35' },
-    { id: 10, name: 'Canara', color: '#0066B2' },
-    { id: 11, name: 'IndusInd', color: '#EC1C24' },
-    { id: 12, name: 'IDBI', color: '#0047A3' },
-  ];
-
-  const posters = [
-    { id: 1, title: 'Oral Cancer', description: 'Early detection saves lives. Learn about symptoms and prevention methods.' },
-    { id: 2, title: 'Heart Health', description: 'Understanding cardiovascular risks and maintaining a healthy heart.' },
-    { id: 3, title: 'Diabetes Care', description: 'Comprehensive guide to managing diabetes and living a healthy life.' },
-    { id: 4, title: 'Mental Wellness', description: 'Prioritizing mental health in today\'s fast-paced world.' },
-    { id: 5, title: 'Bone Health', description: 'Preventing osteoporosis and maintaining strong bones throughout life.' },
-    { id: 6, title: 'Eye Care', description: 'Protecting your vision and preventing common eye disorders.' },
-    { id: 7, title: 'Skin Health', description: 'Essential tips for maintaining healthy and glowing skin.' },
-    { id: 8, title: 'Immunity Boost', description: 'Natural ways to strengthen your immune system year-round.' },
-    { id: 9, title: 'Sleep Disorders', description: 'Understanding sleep patterns and improving sleep quality.' },
-    { id: 10, title: 'Nutrition Basics', description: 'Building a balanced diet for optimal health and wellness.' },
-    { id: 11, title: 'Exercise Benefits', description: 'How regular physical activity transforms your overall health.' },
-    { id: 12, title: 'Stress Management', description: 'Effective techniques to manage daily stress and anxiety.' },
-    { id: 13, title: 'Women\'s Health', description: 'Comprehensive care for women at every life stage.' },
-    { id: 14, title: 'Senior Care', description: 'Specialized healthcare solutions for elderly wellness.' },
-  ];
-
-  const banners = [
-    { id: 1, title: 'Family Insurance Offer', subtitle: 'Get 20% OFF on family health insurance plans' },
-    { id: 2, title: 'ICICI PF NPS Plan', subtitle: 'Unlock upto 18% discounts under ICICI PF NPS SWASTHYA EQUITY Plus Plan' },
-    { id: 3, title: 'Summer Health Camp', subtitle: 'Special health checkup packages at discounted rates' },
-  ];
+// ============================================================================
+// ANIMATED APOLLO LOGO
+// ============================================================================
+const AnimatedApolloLogo = React.memo(() => {
+  const rotation = useSharedValue(0);
+  const glowOpacity = useSharedValue(0.3);
+  const scale = useSharedValue(1);
 
   useEffect(() => {
-    const bankInterval = setInterval(() => {
-      Animated.timing(bankScrollX, {
-        toValue: bankScrollX._value + 1,
-        duration: 50,
-        useNativeDriver: true,
-      }).start();
-    }, 50);
+    // Subtle continuous rotation
+    rotation.value = withRepeat(
+      withTiming(360, { duration: 20000, easing: Easing.linear }),
+      -1,
+      false
+    );
 
-    return () => clearInterval(bankInterval);
+    // Gold glow pulse
+    glowOpacity.value = withRepeat(
+      withSequence(
+        withTiming(0.6, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.3, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
   }, []);
 
-  const addToCart = useCallback(() => {
-    setCartCount(prev => prev + 1);
-  }, []);
+  const logoAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
 
-  const renderHeader = () => (
-    <View style={styles.header}>
-      <View style={styles.headerLeft}>
-        <Text style={styles.greeting}>Namaste Guest</Text>
-        <View style={styles.locationRow}>
-          <Text style={styles.location}>Delhi 110001</Text>
-          <Ionicons name="chevron-down" size={16} color="#666" />
-        </View>
-      </View>
-      <View style={styles.headerRight}>
-        <View style={styles.walletBadge}>
-          <Text style={styles.walletText}>HC</Text>
-          <Text style={styles.walletAmount}>₹50</Text>
-        </View>
-        <View style={styles.profileAvatar}>
-          <Ionicons name="person" size={24} color="#FFD700" />
-        </View>
-      </View>
-    </View>
-  );
-
-  const renderSearchBar = () => (
-    <View style={styles.searchContainer}>
-      <View style={styles.searchBar}>
-        <Ionicons name="search" size={20} color="#999" />
-        <Text style={styles.searchPlaceholder}>Search</Text>
-        <View style={styles.aiAssistant}>
-          <View style={styles.aiAvatar}>
-            <Text style={styles.aiText}>AI</Text>
-          </View>
-        </View>
-      </View>
-      <TouchableOpacity style={styles.cartButton}>
-        <Ionicons name="cart-outline" size={24} color="#00A651" />
-        {cartCount > 0 && (
-          <View style={styles.cartBadge}>
-            <Text style={styles.cartBadgeText}>{cartCount}</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-    </View>
-  );
-
-  const renderCategories = () => (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={styles.categoriesContainer}
-      contentContainerStyle={styles.categoriesContent}
-    >
-      {categories.map((category, index) => (
-        <TouchableOpacity
-          key={index}
-          style={[
-            styles.categoryChip,
-            selectedCategory === category && styles.categoryChipActive
-          ]}
-          onPress={() => setSelectedCategory(category)}
-        >
-          <Text style={[
-            styles.categoryText,
-            selectedCategory === category && styles.categoryTextActive
-          ]}>
-            {category}
-            {category === 'Summer' && (
-              <Text style={styles.newBadge}> NEW</Text>
-            )}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  );
-
-  const renderHeroSection = () => (
-    <View style={styles.heroSection}>
-      <Text style={styles.heroTitle}>Your trusted home</Text>
-      <Text style={styles.heroSubtitle}>for end-to-end healthcare</Text>
-      <View style={styles.dividerContainer}>
-        <View style={styles.divider} />
-        <Text style={styles.poweredText}>POWERED BY 40+ YEARS OF LEGACY</Text>
-        <View style={styles.divider} />
-      </View>
-      <View style={styles.logosRow}>
-        {['Apollo Pharmacy', 'Apollo Diagnostics', 'Apollo 24/7', 'Apollo Hospitals', 'Apollo Insurance'].map((logo, index) => (
-          <View key={index} style={styles.logoItem}>
-            <Text style={styles.logoText}>{logo}</Text>
-          </View>
-        ))}
-      </View>
-    </View>
-  );
-
-  const renderServicesGrid = () => (
-    <View style={styles.servicesGrid}>
-      {services.map((service) => (
-        <TouchableOpacity key={service.id} style={styles.serviceCard}>
-          <View style={[styles.serviceIcon, { backgroundColor: service.color }]}>
-            <Ionicons name={service.icon} size={32} color="#fff" />
-          </View>
-          <Text style={styles.serviceTitle}>{service.title}</Text>
-          <Text style={styles.serviceOffer}>{service.offer}</Text>
-          <Ionicons name="chevron-forward" size={16} color="#00A651" style={styles.serviceArrow} />
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
-
-  const renderPrescriptionBar = () => (
-    <View style={styles.prescriptionBar}>
-      <Ionicons name="document-text" size={24} color="#00A651" />
-      <Text style={styles.prescriptionText}>Place An Order With Prescription</Text>
-      <TouchableOpacity style={styles.orderButton}>
-        <Text style={styles.orderButtonText}>Order Now</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const renderBuyAgain = () => (
-    <View style={styles.buyAgainSection}>
-      <View style={styles.buyAgainHeader}>
-        <Text style={styles.buyAgainTitle}>Buy Again</Text>
-        <TouchableOpacity>
-          <Text style={styles.viewAllText}>View All</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.buyAgainTabs}>
-        <TouchableOpacity style={styles.tabActive}>
-          <Text style={styles.tabTextActive}>All</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tab}>
-          <Text style={styles.tabText}>Medicines</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
-  const renderMedicineCard = ({ item, index }) => (
-    <TouchableOpacity style={styles.medicineCard} onPress={addToCart}>
-      <View style={styles.medicineAddButton}>
-        <Text style={styles.medicineAddText}>+</Text>
-      </View>
-      <View style={styles.medicineImage} />
-      <Text style={styles.medicineName} numberOfLines={2}>{item.name}</Text>
-      <Text style={styles.medicinePrice}>₹{item.price}/unit</Text>
-      <Text style={styles.medicineOldPrice}>₹{item.oldPrice}</Text>
-      <Text style={styles.medicineDiscount}>{item.discount}% OFF</Text>
-      <Text style={styles.medicineDelivery}>By {item.delivery}</Text>
-    </TouchableOpacity>
-  );
-
-  const renderBankOffers = () => (
-    <View style={styles.bankOffersSection}>
-      <Animated.FlatList
-        data={[...banks, ...banks]}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => `bank-${index}`}
-        renderItem={({ item }) => (
-          <View style={[styles.bankCard, { backgroundColor: item.color }]}>
-            <Text style={styles.bankOfferText}>Extra 10% OFF*</Text>
-            <Text style={styles.bankDetailsText}>(Avail on Payment Page via {item.name} DC)</Text>
-            <Text style={styles.bankTcText}>*T&C's</Text>
-          </View>
-        )}
-        scrollEnabled={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: bankScrollX } } }],
-          { useNativeDriver: true }
-        )}
-      />
-    </View>
-  );
-
-  const renderCuratedOfferings = () => (
-    <View style={styles.curatedSection}>
-      <Text style={styles.curatedTitle}>Curated Offerings For You</Text>
-      {[
-        { title: 'Apollo SBI Card SELECT', icon: 'card' },
-        { title: 'Join Circle Membership', icon: 'people' },
-        { title: 'My Health Records & Insights', icon: 'folder' }
-      ].map((item, index) => (
-        <TouchableOpacity key={index} style={styles.curatedCard}>
-          <View style={styles.curatedIcon}>
-            <Ionicons name={item.icon} size={32} color="#00A651" />
-          </View>
-          <Text style={styles.curatedCardTitle}>{item.title}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
-
-  const renderPromotionBanners = () => (
-    <View style={styles.promotionSection}>
-      <Animated.FlatList
-        data={[...banners, ...banners]}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => `banner-${index}`}
-        renderItem={({ item }) => (
-          <View style={styles.promotionBanner}>
-            <Text style={styles.promotionTitle}>{item.title}</Text>
-            <Text style={styles.promotionSubtitle}>{item.subtitle}</Text>
-            <Ionicons name="chevron-forward" size={20} color="#00A651" />
-          </View>
-        )}
-        scrollEnabled={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: bannerScrollX } } }],
-          { useNativeDriver: true }
-        )}
-      />
-    </View>
-  );
-
-  const renderContentCards = () => (
-    <View style={styles.contentCardsSection}>
-      <View style={styles.contentCard}>
-        <Text style={styles.contentCardTitle}>Apollo 24|7</Text>
-        <Text style={styles.contentCardSubtitle}>Think About It</Text>
-        <Text style={styles.contentCardDescription}>Health Explained by Experts</Text>
-        <TouchableOpacity style={styles.contentCardButton}>
-          <Text style={styles.contentCardButtonText}>Watch on JioHotstar</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.contentCard}>
-        <Text style={styles.contentCardTitle}>PRO Health</Text>
-        <Text style={styles.contentCardDescription}>Apollo's Personalised Health Program</Text>
-        <TouchableOpacity style={styles.contentCardButton}>
-          <Text style={styles.contentCardButtonText}>Explore More</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
-  const renderAskApolloPosters = () => (
-    <View style={styles.askApolloSection}>
-      <Text style={styles.askApolloTitle}>Ask Apollo</Text>
-      <Animated.FlatList
-        data={[...posters, ...posters]}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => `poster-${index}`}
-        renderItem={({ item }) => (
-          <LinearGradient
-            colors={['#FF6B35', '#FF4444']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.posterCard}
-          >
-            <View style={styles.posterContent}>
-              <Text style={styles.posterTitle}>{item.title}</Text>
-              <Text style={styles.posterDescription} numberOfLines={3}>{item.description}</Text>
-              <TouchableOpacity style={styles.posterButton}>
-                <Text style={styles.posterButtonText}>Find Answer</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.posterIllustration}>
-              <Ionicons name="person" size={40} color="#fff" />
-            </View>
-          </LinearGradient>
-        )}
-        scrollEnabled={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: posterScrollX } } }],
-          { useNativeDriver: true }
-        )}
-      />
-    </View>
-  );
-
-  const renderTrustBadges = () => (
-    <View style={styles.trustBadgesSection}>
-      {[
-        { title: 'Safe Secure', icon: 'shield-checkmark' },
-        { title: 'Fully Reliable', icon: 'checkmark-circle' },
-        { title: 'Genuine Products', icon: 'medal' }
-      ].map((badge, index) => (
-        <View key={index} style={styles.trustBadge}>
-          <View style={styles.trustBadgeIcon}>
-            <Ionicons name={badge.icon} size={24} color="#FFD700" />
-          </View>
-          <Text style={styles.trustBadgeText}>{badge.title}</Text>
-        </View>
-      ))}
-    </View>
-  );
-
-  const renderFooter = () => (
-    <View style={styles.footer}>
-      <Text style={styles.versionText}>PROD - v 9.0.3 (612)</Text>
-      <Text style={styles.liveHealthyText}>Live Healthy</Text>
-      <Text style={styles.craftedText}>Crafted with ❤️ in India</Text>
-      <View style={styles.poweredBy}>
-        <Text style={styles.poweredByText}>Powered by:</Text>
-        <Text style={styles.poweredBrands}>Apollo Pharmacy • Apollo 24/7 • Apollo Hospitals</Text>
-      </View>
-    </View>
-  );
+  const glowStyle = useAnimatedStyle(() => ({
+    opacity: glowOpacity.value,
+  }));
 
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" />
-        <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
-          {renderHeader()}
-          {renderSearchBar()}
-          {renderCategories()}
-          {renderHeroSection()}
-          {renderServicesGrid()}
-          {renderPrescriptionBar()}
-          {renderBuyAgain()}
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={medicines}
-            renderItem={renderMedicineCard}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={styles.medicinesList}
+    <View style={styles.apolloLogoContainer}>
+      <Animated.View style={[styles.apolloLogoGlow, glowStyle]} />
+      <Animated.View style={[styles.apolloLogoInner, logoAnimatedStyle]}>
+        <Ionicons name="medical" size={18} color={COLORS.apolloGreen} />
+      </Animated.View>
+    </View>
+  );
+});
+
+// ============================================================================
+// ANIMATED WALLET BADGE
+// ============================================================================
+const AnimatedWalletBadge = React.memo(() => {
+  const scale = useSharedValue(1);
+  const glowOpacity = useSharedValue(0);
+
+  const handlePressIn = useCallback(() => {
+    scale.value = withSpring(0.92, ANIMATION.spring.press);
+    glowOpacity.value = withTiming(1, { duration: ANIMATION.duration.fast });
+  }, []);
+
+  const handlePressOut = useCallback(() => {
+    scale.value = withSpring(1, ANIMATION.spring.gentle);
+    glowOpacity.value = withTiming(0, { duration: ANIMATION.duration.normal });
+  }, []);
+
+  const walletAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View style={walletAnimatedStyle}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={styles.walletBadge}
+      >
+        <Text style={styles.walletAmountText}>&#8377;50</Text>
+        <View style={styles.walletHcBadge}>
+          <Text style={styles.walletHcText}>HC</Text>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+});
+
+// ============================================================================
+// ANIMATED PROFILE AVATAR
+// ============================================================================
+const AnimatedProfileAvatar = React.memo(() => {
+  const scale = useSharedValue(1);
+  const glowOpacity = useSharedValue(0);
+  const borderPulse = useSharedValue(0);
+
+  useEffect(() => {
+    borderPulse.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 2500, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+  }, []);
+
+  const handlePressIn = useCallback(() => {
+    scale.value = withSpring(0.9, ANIMATION.spring.press);
+    glowOpacity.value = withTiming(1, { duration: ANIMATION.duration.fast });
+  }, []);
+
+  const handlePressOut = useCallback(() => {
+    scale.value = withSpring(1, ANIMATION.spring.bouncy);
+    glowOpacity.value = withTiming(0, { duration: ANIMATION.duration.normal });
+  }, []);
+
+  const avatarAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const glowStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(borderPulse.value, [0, 1], [0.3, 0.7]),
+    transform: [{ scale: interpolate(borderPulse.value, [0, 1], [1, 1.12]) }],
+  }));
+
+  return (
+    <Animated.View style={avatarAnimatedStyle}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={styles.profileAvatarContainer}
+      >
+        <Animated.View style={[styles.profileAvatarGlow, glowStyle]} />
+        <View style={styles.profileAvatar}>
+          <Ionicons name="person" size={20} color={COLORS.royalGold} />
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+});
+
+// ============================================================================
+// STICKY HEADER COMPONENT
+// ============================================================================
+const StickyHeader = React.memo(({ scrollY }) => {
+  const entranceOpacity = useSharedValue(0);
+  const entranceTranslateY = useSharedValue(-20);
+
+  useEffect(() => {
+    entranceOpacity.value = withTiming(1, { duration: ANIMATION.duration.smooth });
+    entranceTranslateY.value = withSpring(0, ANIMATION.spring.gentle);
+  }, []);
+
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    const elevation = interpolate(
+      scrollY.value,
+      [0, 50],
+      [0, 1],
+      Extrapolation.CLAMP
+    );
+    return {
+      opacity: entranceOpacity.value,
+      transform: [{ translateY: entranceTranslateY.value }],
+      shadowOpacity: elevation * 0.12,
+    };
+  });
+
+  return (
+    <Animated.View style={[styles.stickyHeader, headerAnimatedStyle]}>
+      <LinearGradient
+        colors={[COLORS.cardWhite, COLORS.backgroundSoft]}
+        style={styles.headerGradient}
+      >
+        {/* Left side: Greeting + Location */}
+        <View style={styles.headerLeft}>
+          <View style={styles.greetingRow}>
+            <Text style={styles.greetingText}>Namaste </Text>
+            <Text style={styles.greetingName}>Guest</Text>
+          </View>
+          <TouchableOpacity activeOpacity={0.7} style={styles.locationRow}>
+            <Ionicons name="location-sharp" size={12} color={COLORS.premiumOrange} />
+            <Text style={styles.locationText}>Delhi 110001</Text>
+            <Ionicons name="chevron-down" size={12} color={COLORS.textTertiary} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Right side: Logo + Wallet + Profile */}
+        <View style={styles.headerRight}>
+          <AnimatedApolloLogo />
+          <AnimatedWalletBadge />
+          <AnimatedProfileAvatar />
+        </View>
+      </LinearGradient>
+    </Animated.View>
+  );
+});
+
+// ============================================================================
+// SEARCH BAR COMPONENT
+// ============================================================================
+const SearchBarRow = React.memo(({ cartCount, scrollY }) => {
+  const searchScale = useSharedValue(1);
+  const cartBounce = useSharedValue(1);
+  const entranceOpacity = useSharedValue(0);
+  const entranceTranslateY = useSharedValue(15);
+  const aiPulse = useSharedValue(0);
+
+  useEffect(() => {
+    entranceOpacity.value = withDelay(100, withTiming(1, { duration: ANIMATION.duration.smooth }));
+    entranceTranslateY.value = withDelay(100, withSpring(0, ANIMATION.spring.gentle));
+
+    // AI badge subtle pulse
+    aiPulse.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 1800, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 1800, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+  }, []);
+
+  // Bounce cart badge when count changes
+  useEffect(() => {
+    if (cartCount > 0) {
+      cartBounce.value = withSequence(
+        withSpring(1.4, { damping: 4, stiffness: 400 }),
+        withSpring(1, ANIMATION.spring.gentle)
+      );
+    }
+  }, [cartCount]);
+
+  const searchAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: entranceOpacity.value,
+    transform: [{ translateY: entranceTranslateY.value }],
+  }));
+
+  const cartBadgeAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: cartBounce.value }],
+  }));
+
+  const aiPulseStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(aiPulse.value, [0, 1], [0.7, 1]),
+    transform: [{ scale: interpolate(aiPulse.value, [0, 1], [0.95, 1.05]) }],
+  }));
+
+  const handleSearchPressIn = useCallback(() => {
+    searchScale.value = withSpring(0.98, ANIMATION.spring.press);
+  }, []);
+
+  const handleSearchPressOut = useCallback(() => {
+    searchScale.value = withSpring(1, ANIMATION.spring.gentle);
+  }, []);
+
+  const searchBarScaleStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: searchScale.value }],
+  }));
+
+  return (
+    <Animated.View style={[styles.searchBarContainer, searchAnimatedStyle]}>
+      {/* Search Field */}
+      <Animated.View style={[styles.searchBarOuter, searchBarScaleStyle]}>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPressIn={handleSearchPressIn}
+          onPressOut={handleSearchPressOut}
+          style={styles.searchBar}
+        >
+          <View style={styles.searchIconContainer}>
+            <Ionicons name="search" size={18} color={COLORS.textTertiary} />
+          </View>
+          <Text style={styles.searchPlaceholder}>Search medicines, doctors, labs...</Text>
+          <Animated.View style={[styles.aiAssistantBadge, aiPulseStyle]}>
+            <LinearGradient
+              colors={[COLORS.apolloGreen, COLORS.apolloGreenLight]}
+              style={styles.aiGradient}
+            >
+              <Text style={styles.aiText}>AI</Text>
+            </LinearGradient>
+          </Animated.View>
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Cart Button */}
+      <TouchableOpacity activeOpacity={0.7} style={styles.cartButton}>
+        <View style={styles.cartIconContainer}>
+          <Ionicons name="cart-outline" size={22} color={COLORS.apolloGreen} />
+        </View>
+        {cartCount > 0 && (
+          <Animated.View style={[styles.cartBadge, cartBadgeAnimatedStyle]}>
+            <Text style={styles.cartBadgeText}>{cartCount}</Text>
+          </Animated.View>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
+  );
+});
+
+// ============================================================================
+// ANIMATED CATEGORY CHIP
+// ============================================================================
+const AnimatedCategoryChip = React.memo(({ category, isActive, onPress, index }) => {
+  const chipScale = useSharedValue(1);
+  const chipOpacity = useSharedValue(0);
+  const chipTranslateX = useSharedValue(20);
+  const iconRotation = useSharedValue(0);
+
+  useEffect(() => {
+    const delay = index * 50;
+    chipOpacity.value = withDelay(delay, withTiming(1, { duration: ANIMATION.duration.normal }));
+    chipTranslateX.value = withDelay(delay, withSpring(0, ANIMATION.spring.gentle));
+  }, [index]);
+
+  const handlePressIn = useCallback(() => {
+    chipScale.value = withSpring(0.93, ANIMATION.spring.press);
+    iconRotation.value = withSpring(ANIMATION.rotation.iconTilt, ANIMATION.spring.bouncy);
+  }, []);
+
+  const handlePressOut = useCallback(() => {
+    chipScale.value = withSpring(1, ANIMATION.spring.gentle);
+    iconRotation.value = withSpring(0, ANIMATION.spring.gentle);
+  }, []);
+
+  const chipAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: chipOpacity.value,
+    transform: [
+      { translateX: chipTranslateX.value },
+      { scale: chipScale.value },
+    ],
+  }));
+
+  const iconStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${iconRotation.value}deg` }],
+  }));
+
+  return (
+    <Animated.View style={chipAnimatedStyle}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={() => onPress(category.id)}
+        style={[
+          styles.categoryChip,
+          isActive && styles.categoryChipActive,
+        ]}
+      >
+        <Animated.View style={iconStyle}>
+          <Ionicons
+            name={category.icon}
+            size={16}
+            color={isActive ? COLORS.apolloGreen : COLORS.textTertiary}
           />
-          {renderBankOffers()}
-          {renderCuratedOfferings()}
-          {renderPromotionBanners()}
-          {renderContentCards()}
-          {renderAskApolloPosters()}
-          {renderTrustBadges()}
-          {renderFooter()}
-        </ScrollView>
+        </Animated.View>
+        <Text style={[
+          styles.categoryText,
+          isActive && styles.categoryTextActive,
+        ]}>
+          {category.label}
+        </Text>
+        {category.isNew && (
+          <View style={styles.newBadge}>
+            <Text style={styles.newBadgeText}>NEW</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
+  );
+});
+
+// ============================================================================
+// CATEGORY NAVIGATION
+// ============================================================================
+const CategoryNav = React.memo(({ selectedCategory, onCategoryChange }) => {
+  const categories = useMemo(() => DATA.categories, []);
+  const navOpacity = useSharedValue(0);
+
+  useEffect(() => {
+    navOpacity.value = withDelay(200, withTiming(1, { duration: ANIMATION.duration.smooth }));
+  }, []);
+
+  const navAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: navOpacity.value,
+  }));
+
+  return (
+    <Animated.View style={[styles.categoryNavContainer, navAnimatedStyle]}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.categoryNavContent}
+        bounces={true}
+        overScrollMode="never"
+      >
+        {categories.map((category, index) => (
+          <AnimatedCategoryChip
+            key={category.id}
+            category={category}
+            isActive={selectedCategory === category.id}
+            onPress={onCategoryChange}
+            index={index}
+          />
+        ))}
+      </ScrollView>
+      {/* Bottom gold accent line */}
+      <View style={styles.categoryNavBottomLine} />
+    </Animated.View>
+  );
+});
+
+// ============================================================================
+// MAIN HOME SCREEN COMPONENT
+// ============================================================================
+export default function HomeScreen() {
+  // ========================================================================
+  // STATE
+  // ========================================================================
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [cartCount, setCartCount] = useState(0);
+  const [activeTab, setActiveTab] = useState(0);
+  const [medicineQuantities, setMedicineQuantities] = useState({});
+
+  // ========================================================================
+  // REFS & ANIMATED VALUES
+  // ========================================================================
+  const scrollY = useSharedValue(0);
+  const router = useRouter();
+
+  // ========================================================================
+  // SCROLL HANDLER
+  // ========================================================================
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  // ========================================================================
+  // CALLBACKS
+  // ========================================================================
+  const handleCategoryChange = useCallback((categoryId) => {
+    setSelectedCategory(categoryId);
+  }, []);
+
+  const handleServicePress = useCallback((service) => {
+    // Navigate to service-specific screen
+  }, []);
+
+  const handleOrderPress = useCallback(() => {
+    // Navigate to prescription upload
+  }, []);
+
+  const handleViewAllBuyAgain = useCallback(() => {
+    router.push('/BuyAgainScreen');
+  }, [router]);
+
+  const handleTabChange = useCallback((tabIndex) => {
+    setActiveTab(tabIndex);
+  }, []);
+
+  const handleAddToCart = useCallback((medicineId, delta) => {
+    setMedicineQuantities(prev => {
+      const current = prev[medicineId] || 0;
+      const next = Math.max(0, current + delta);
+      const newState = { ...prev, [medicineId]: next };
+      return newState;
+    });
+    if (delta > 0) {
+      setCartCount(prev => prev + 1);
+    } else {
+      setCartCount(prev => Math.max(0, prev - 1));
+    }
+  }, []);
+
+  // ========================================================================
+  // RENDER
+  // ========================================================================
+  return (
+    <GestureHandlerRootView style={styles.rootContainer}>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar
+          barStyle="dark-content"
+          backgroundColor={COLORS.cardWhite}
+          translucent={false}
+        />
+
+        {/* Background Gradient */}
+        <LinearGradient
+          colors={COLORS.gradientBackground}
+          style={styles.backgroundGradient}
+        />
+
+        {/* Sticky Header */}
+        <StickyHeader scrollY={scrollY} />
+
+        {/* Search Bar */}
+        <SearchBarRow cartCount={cartCount} scrollY={scrollY} />
+
+        {/* Category Navigation */}
+        <CategoryNav
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
+        />
+
+        {/* Scrollable Content */}
+        <AnimatedScrollView
+          onScroll={scrollHandler}
+          scrollEventThrottle={16}
+          showsVerticalScrollIndicator={false}
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          bounces={true}
+          overScrollMode="never"
+          removeClippedSubviews={Platform.OS === 'android'}
+        >
+          {/* Hero Section */}
+          <HeroSection isVisible={true} />
+
+          {/* Services Grid - 2x2 */}
+          <ServicesGrid onServicePress={handleServicePress} />
+
+          {/* Prescription Order Bar */}
+          <PrescriptionBar onOrderPress={handleOrderPress} />
+
+          {/* Buy Again Section */}
+          <BuyAgainHeader
+            onViewAll={handleViewAllBuyAgain}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+          />
+
+          {/* Medicine Cards Carousel */}
+          <MedicineCarousel
+            onAddToCart={handleAddToCart}
+            quantities={medicineQuantities}
+          />
+
+          {/* Bank Offers Auto Carousel */}
+          <BankOffersCarousel />
+
+          {/* Curated Offerings */}
+          <CuratedOfferings />
+
+          {/* Promotion Banners Auto Carousel */}
+          <PromotionBanners />
+
+          {/* Content Cards */}
+          <ContentCards />
+
+          {/* Ask Apollo Poster Carousel */}
+          <AskApolloCarousel />
+
+          {/* Trust Badges */}
+          <TrustBadges />
+
+          {/* Footer */}
+          <Footer />
+
+          {/* Bottom Spacer for tab bar */}
+          <View style={styles.bottomSpacer} />
+        </AnimatedScrollView>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
 }
 
+// ============================================================================
+// STYLES
+// ============================================================================
 const styles = StyleSheet.create({
-  container: {
+  // ========================================================================
+  // ROOT & CONTAINER STYLES
+  // ========================================================================
+  rootContainer: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: COLORS.backgroundStart,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.cardWhite,
+  },
+  backgroundGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   scrollView: {
     flex: 1,
   },
-  header: {
-    height: 80,
+  scrollContent: {
+    paddingBottom: SPACING.lg,
+  },
+  bottomSpacer: {
+    height: SPACING.xxl,
+  },
+
+  // ========================================================================
+  // STICKY HEADER STYLES
+  // ========================================================================
+  stickyHeader: {
+    zIndex: 100,
+    ...SHADOWS.header,
+  },
+  headerGradient: {
+    height: LAYOUT.headerHeight,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingHorizontal: SPACING.screenPadding,
+    borderBottomWidth: 0.5,
+    borderBottomColor: COLORS.dividerLight,
   },
   headerLeft: {
     flex: 1,
+    justifyContent: 'center',
   },
-  greeting: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+  greetingRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  greetingText: {
+    ...TYPOGRAPHY.bodyLarge,
+    color: COLORS.textSecondary,
+  },
+  greetingName: {
+    ...TYPOGRAPHY.h3,
+    color: COLORS.textPrimary,
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 3,
+    gap: 3,
   },
-  location: {
-    fontSize: 14,
-    color: '#666',
-    marginRight: 4,
+  locationText: {
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.textTertiary,
+    fontWeight: '500',
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: SPACING.md,
   },
-  walletBadge: {
+
+  // ========================================================================
+  // APOLLO LOGO STYLES
+  // ========================================================================
+  apolloLogoContainer: {
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    position: 'relative',
   },
-  walletText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#00A651',
-  },
-  walletAmount: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  profileAvatar: {
+  apolloLogoGlow: {
+    position: 'absolute',
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFF8DC',
+    backgroundColor: COLORS.royalGoldGlow,
+  },
+  apolloLogoInner: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: COLORS.cardWhite,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: COLORS.apolloGreenSubtle,
+    ...SHADOWS.subtle,
+  },
+
+  // ========================================================================
+  // WALLET BADGE STYLES
+  // ========================================================================
+  walletBadge: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  walletAmountText: {
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.textPrimary,
+    fontWeight: '800',
+  },
+  walletHcBadge: {
+    backgroundColor: COLORS.apolloGreen,
+    borderRadius: RADIUS.xs,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    marginTop: 1,
+  },
+  walletHcText: {
+    ...TYPOGRAPHY.badge,
+    color: COLORS.textWhite,
+    fontWeight: '900',
+    fontSize: 8,
+  },
+
+  // ========================================================================
+  // PROFILE AVATAR STYLES
+  // ========================================================================
+  profileAvatarContainer: {
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileAvatarGlow: {
+    position: 'absolute',
+    width: LAYOUT.profileAvatarSize + 8,
+    height: LAYOUT.profileAvatarSize + 8,
+    borderRadius: (LAYOUT.profileAvatarSize + 8) / 2,
+    backgroundColor: COLORS.royalGoldGlow,
+  },
+  profileAvatar: {
+    width: LAYOUT.profileAvatarSize,
+    height: LAYOUT.profileAvatarSize,
+    borderRadius: LAYOUT.profileAvatarSize / 2,
+    backgroundColor: COLORS.backgroundCream,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#FFD700',
+    borderColor: COLORS.royalGold,
+    ...SHADOWS.goldGlow,
   },
-  searchContainer: {
+
+  // ========================================================================
+  // SEARCH BAR STYLES
+  // ========================================================================
+  searchBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    gap: 12,
+    paddingHorizontal: SPACING.screenPadding,
+    paddingVertical: SPACING.md,
+    gap: SPACING.md,
+    backgroundColor: COLORS.cardWhite,
+  },
+  searchBarOuter: {
+    flex: 1,
   },
   searchBar: {
-    flex: 1,
-    height: 60,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 30,
+    height: LAYOUT.searchBarHeight,
+    backgroundColor: COLORS.backgroundMuted,
+    borderRadius: RADIUS.search,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    gap: 12,
+    paddingHorizontal: SPACING.lg,
+    gap: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+  },
+  searchIconContainer: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: COLORS.cardWhite,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.subtle,
   },
   searchPlaceholder: {
     flex: 1,
-    fontSize: 16,
-    color: '#999',
+    ...TYPOGRAPHY.bodyMedium,
+    color: COLORS.textMuted,
   },
-  aiAssistant: {
-    alignItems: 'center',
+  aiAssistantBadge: {
+    overflow: 'hidden',
+    borderRadius: LAYOUT.aiBadgeSize / 2,
   },
-  aiAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#00A651',
+  aiGradient: {
+    width: LAYOUT.aiBadgeSize,
+    height: LAYOUT.aiBadgeSize,
+    borderRadius: LAYOUT.aiBadgeSize / 2,
     justifyContent: 'center',
     alignItems: 'center',
+    ...SHADOWS.button,
   },
   aiText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#fff',
+    ...TYPOGRAPHY.badge,
+    color: COLORS.textWhite,
+    fontWeight: '900',
+    fontSize: 11,
   },
   cartButton: {
     width: 48,
     height: 48,
-    borderRadius: 12,
-    backgroundColor: '#F5F5F5',
+    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.backgroundMuted,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+  },
+  cartIconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cartBadge: {
     position: 'absolute',
     top: -4,
     right: -4,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#FF6B35',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cartBadgeText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  categoriesContainer: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 12,
-  },
-  categoriesContent: {
-    paddingHorizontal: 20,
-    gap: 12,
-  },
-  categoryChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F5',
-  },
-  categoryChipActive: {
-    backgroundColor: '#FFD70020',
-    borderBottomWidth: 2,
-    borderBottomColor: '#FFD700',
-  },
-  categoryText: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-  },
-  categoryTextActive: {
-    color: '#00A651',
-    fontWeight: 'bold',
-  },
-  newBadge: {
-    fontSize: 10,
-    color: '#FF6B35',
-    fontWeight: 'bold',
-  },
-  heroSection: {
-    padding: 24,
-    alignItems: 'center',
-  },
-  heroTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-  },
-  heroSubtitle: {
-    fontSize: 18,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 16,
-    gap: 12,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#E0E0E0',
-  },
-  poweredText: {
-    fontSize: 12,
-    color: '#999',
-    fontWeight: '500',
-  },
-  logosRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginTop: 16,
-    gap: 16,
-  },
-  logoItem: {
-    paddingHorizontal: 8,
-  },
-  logoText: {
-    fontSize: 12,
-    color: '#00A651',
-    fontWeight: '600',
-  },
-  servicesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    gap: 16,
-  },
-  serviceCard: {
-    width: CARD_WIDTH,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  serviceIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  serviceTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  serviceOffer: {
-    fontSize: 12,
-    color: '#FF6B35',
-    fontWeight: '500',
-    marginBottom: 8,
-  },
-  serviceArrow: {
-    alignSelf: 'flex-end',
-  },
-  prescriptionBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 20,
-    marginVertical: 16,
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    gap: 12,
-  },
-  prescriptionText: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-  },
-  orderButton: {
-    backgroundColor: '#00A651',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
-  },
-  orderButtonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  buyAgainSection: {
-    paddingHorizontal: 20,
-    marginTop: 8,
-  },
-  buyAgainHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  buyAgainTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  viewAllText: {
-    fontSize: 14,
-    color: '#00A651',
-    fontWeight: '600',
-  },
-  buyAgainTabs: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  tabActive: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#00A651',
-    paddingBottom: 8,
-  },
-  tab: {
-    paddingBottom: 8,
-  },
-  tabTextActive: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#00A651',
-  },
-  tabText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  medicinesList: {
-    paddingHorizontal: 20,
-    gap: 12,
-  },
-  medicineCard: {
-    width: MEDICINE_CARD_WIDTH,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    padding: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  medicineAddButton: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#00A651',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'flex-end',
-  },
-  medicineAddText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  medicineImage: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 8,
-    marginVertical: 8,
-    alignSelf: 'center',
-  },
-  medicineName: {
-    fontSize: 10,
-    color: '#333',
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  medicinePrice: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  medicineOldPrice: {
-    fontSize: 8,
-    color: '#999',
-    textDecorationLine: 'line-through',
-  },
-  medicineDiscount: {
-    fontSize: 8,
-    color: '#FF6B35',
-    fontWeight: 'bold',
-  },
-  medicineDelivery: {
-    fontSize: 8,
-    color: '#666',
-    marginTop: 4,
-  },
-  bankOffersSection: {
-    marginTop: 24,
-  },
-  bankCard: {
-    width: width - 40,
-    marginHorizontal: 20,
-    padding: 16,
-    borderRadius: 12,
-    marginRight: 16,
-  },
-  bankOfferText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  bankDetailsText: {
-    fontSize: 12,
-    color: '#fff',
-    opacity: 0.9,
-    marginBottom: 4,
-  },
-  bankTcText: {
-    fontSize: 10,
-    color: '#fff',
-    opacity: 0.7,
-  },
-  curatedSection: {
-    paddingHorizontal: 20,
-    marginTop: 24,
-  },
-  curatedTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-  },
-  curatedCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    gap: 16,
-  },
-  curatedIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#F0F8FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  curatedCardTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  promotionSection: {
-    marginTop: 24,
-  },
-  promotionBanner: {
-    width: width - 40,
-    marginHorizontal: 20,
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginRight: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  promotionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  promotionSubtitle: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 8,
-  },
-  contentCardsSection: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    marginTop: 24,
-    gap: 16,
-  },
-  contentCard: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  contentCardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#00A651',
-    marginBottom: 4,
-  },
-  contentCardSubtitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  contentCardDescription: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 12,
-  },
-  contentCardButton: {
-    backgroundColor: '#00A651',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-  contentCardButtonText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  askApolloSection: {
-    marginTop: 24,
-    paddingHorizontal: 20,
-  },
-  askApolloTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-  },
-  posterCard: {
-    width: width - 40,
-    marginRight: 16,
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  posterContent: {
-    flex: 1,
-  },
-  posterTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
-  },
-  posterDescription: {
-    fontSize: 12,
-    color: '#fff',
-    opacity: 0.9,
-    marginBottom: 12,
-  },
-  posterButton: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-  posterButtonText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#FF6B35',
-  },
-  posterIllustration: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#fff20',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  trustBadgesSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-  },
-  trustBadge: {
-    alignItems: 'center',
-  },
-  trustBadgeIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#FFF8DC',
+    width: LAYOUT.cartBadgeSize,
+    height: LAYOUT.cartBadgeSize,
+    borderRadius: LAYOUT.cartBadgeSize / 2,
+    backgroundColor: COLORS.premiumOrange,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#FFD700',
-    marginBottom: 8,
+    borderColor: COLORS.cardWhite,
+    ...SHADOWS.subtle,
   },
-  trustBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
+  cartBadgeText: {
+    ...TYPOGRAPHY.badge,
+    color: COLORS.textWhite,
+    fontWeight: '900',
+    fontSize: 9,
   },
-  footer: {
+
+  // ========================================================================
+  // CATEGORY NAVIGATION STYLES
+  // ========================================================================
+  categoryNavContainer: {
+    backgroundColor: COLORS.cardWhite,
+    paddingTop: SPACING.xs,
+    position: 'relative',
+  },
+  categoryNavContent: {
+    paddingHorizontal: SPACING.screenPadding,
+    gap: SPACING.sm,
+    paddingBottom: SPACING.md,
+  },
+  categoryChip: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 32,
-    paddingHorizontal: 20,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm + 1,
+    borderRadius: RADIUS.chip,
+    backgroundColor: COLORS.backgroundMuted,
+    gap: SPACING.xs + 2,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
-  versionText: {
-    fontSize: 10,
-    color: '#999',
-    marginBottom: 8,
+  categoryChipActive: {
+    backgroundColor: COLORS.royalGoldFaded,
+    borderColor: COLORS.royalGold,
+    borderBottomWidth: 2.5,
+    borderBottomColor: COLORS.royalGold,
+    ...SHADOWS.goldGlow,
   },
-  liveHealthyText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#00A651',
-    marginBottom: 8,
+  categoryText: {
+    ...TYPOGRAPHY.labelMedium,
+    color: COLORS.textTertiary,
+    fontWeight: '500',
   },
-  craftedText: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 16,
+  categoryTextActive: {
+    color: COLORS.apolloGreen,
+    fontWeight: '700',
   },
-  poweredBy: {
-    alignItems: 'center',
+  newBadge: {
+    backgroundColor: COLORS.premiumOrangeFaded,
+    borderRadius: RADIUS.xs,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    marginLeft: 2,
   },
-  poweredByText: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
+  newBadgeText: {
+    ...TYPOGRAPHY.badge,
+    color: COLORS.premiumOrange,
+    fontWeight: '900',
+    fontSize: 7,
   },
-  poweredBrands: {
-    fontSize: 10,
-    color: '#999',
+  categoryNavBottomLine: {
+    height: 1,
+    backgroundColor: COLORS.dividerLight,
   },
 });
