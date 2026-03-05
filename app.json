@@ -18,8 +18,7 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router",
-      "expo-linear-gradient"
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": false
