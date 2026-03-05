@@ -10,9 +10,9 @@ import {
   Animated,
   Image,
   StatusBar,
-  SafeAreaView,
-  LinearGradient,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
