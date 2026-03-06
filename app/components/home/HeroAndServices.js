@@ -224,7 +224,6 @@ const AnimatedServiceCard = React.memo(({ service, index, onPress }) => {
   }, [index]);
 
   const handlePressIn = useCallback(() => {
-    'worklet';
     cardScale.value = withSpring(ANIMATION.scale.pressed, ANIMATION.spring.press);
     cardTranslateY.value = withSpring(ANIMATION.translate.cardLift, ANIMATION.spring.press);
     iconRotation.value = withSpring(ANIMATION.rotation.iconTilt, ANIMATION.spring.bouncy);
@@ -234,7 +233,6 @@ const AnimatedServiceCard = React.memo(({ service, index, onPress }) => {
   }, []);
 
   const handlePressOut = useCallback(() => {
-    'worklet';
     cardScale.value = withSpring(1, ANIMATION.spring.gentle);
     cardTranslateY.value = withSpring(0, ANIMATION.spring.gentle);
     iconRotation.value = withSpring(0, ANIMATION.spring.gentle);

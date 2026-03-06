@@ -163,7 +163,7 @@ const AnimatedWalletBadge = React.memo(() => {
 // ============================================================================
 // ANIMATED PROFILE AVATAR
 // ============================================================================
-const AnimatedProfileAvatar = React.memo(() => {
+const AnimatedProfileAvatar = React.memo(({ onPress }) => {
   const scale = useSharedValue(1);
   const glowOpacity = useSharedValue(0);
   const borderPulse = useSharedValue(0);
@@ -204,6 +204,7 @@ const AnimatedProfileAvatar = React.memo(() => {
         activeOpacity={1}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        onPress={onPress}
         style={styles.profileAvatarContainer}
       >
         <Animated.View style={[styles.profileAvatarGlow, glowStyle]} />
@@ -218,7 +219,7 @@ const AnimatedProfileAvatar = React.memo(() => {
 // ============================================================================
 // STICKY HEADER COMPONENT
 // ============================================================================
-const StickyHeader = React.memo(({ scrollY }) => {
+const StickyHeader = React.memo(({ scrollY, onProfilePress }) => {
   const entranceOpacity = useSharedValue(0);
   const entranceTranslateY = useSharedValue(-20);
 
@@ -264,7 +265,7 @@ const StickyHeader = React.memo(({ scrollY }) => {
         <View style={styles.headerRight}>
           <AnimatedApolloLogo />
           <AnimatedWalletBadge />
-          <AnimatedProfileAvatar />
+          <AnimatedProfileAvatar onPress={onProfilePress} />
         </View>
       </LinearGradient>
     </Animated.View>
@@ -274,7 +275,7 @@ const StickyHeader = React.memo(({ scrollY }) => {
 // ============================================================================
 // SEARCH BAR COMPONENT
 // ============================================================================
-const SearchBarRow = React.memo(({ cartCount, scrollY }) => {
+const SearchBarRow = React.memo(({ cartCount, scrollY, onCartPress }) => {
   const searchScale = useSharedValue(1);
   const cartBounce = useSharedValue(1);
   const entranceOpacity = useSharedValue(0);
@@ -358,7 +359,7 @@ const SearchBarRow = React.memo(({ cartCount, scrollY }) => {
       </Animated.View>
 
       {/* Cart Button */}
-      <TouchableOpacity activeOpacity={0.7} style={styles.cartButton}>
+      <TouchableOpacity activeOpacity={0.7} style={styles.cartButton} onPress={onCartPress}>
         <View style={styles.cartIconContainer}>
           <Ionicons name="cart-outline" size={22} color={COLORS.apolloGreen} />
         </View>
@@ -567,10 +568,10 @@ export default function HomeScreen() {
         />
 
         {/* Sticky Header */}
-        <StickyHeader scrollY={scrollY} />
+        <StickyHeader scrollY={scrollY} onProfilePress={() => router.push('/account')} />
 
         {/* Search Bar */}
-        <SearchBarRow cartCount={cartCount} scrollY={scrollY} />
+        <SearchBarRow cartCount={cartCount} scrollY={scrollY} onCartPress={() => router.push('/cart')} />
 
         {/* Category Navigation */}
         <CategoryNav
