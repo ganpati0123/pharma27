@@ -74,6 +74,9 @@ import { BuyAgainHeader, MedicineCarousel, BankOffersCarousel } from '../compone
 import { CuratedOfferings, PromotionBanners, ContentCards, AskApolloCarousel, TrustBadges, Footer } from '../components/home/DiscoverSection';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, ANIMATION, LAYOUT, MIXINS, DATA } from '../components/home/theme';
 
+// Skin Screen (Rose Gold Edition)
+import SkinScreen from '../components/skin/SkinScreen';
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -590,48 +593,60 @@ export default function HomeScreen() {
           overScrollMode="never"
           removeClippedSubviews={Platform.OS === 'android'}
         >
-          {/* Hero Section */}
-          <HeroSection isVisible={true} />
+          {selectedCategory === 'skin' ? (
+            /* ============================================ */
+            /* SKIN PAGE (Rose Gold Edition) */
+            /* ============================================ */
+            <SkinScreen scrollY={scrollY} />
+          ) : (
+            /* ============================================ */
+            /* HOME PAGE (Default) */
+            /* ============================================ */
+            <>
+              {/* Hero Section */}
+              <HeroSection isVisible={true} />
 
-          {/* Services Grid - 2x2 */}
-          <ServicesGrid onServicePress={handleServicePress} />
+              {/* Services Grid - 2x2 */}
+              <ServicesGrid onServicePress={handleServicePress} />
 
-          {/* Prescription Order Bar */}
-          <PrescriptionBar onOrderPress={handleOrderPress} />
+              {/* Prescription Order Bar */}
+              <PrescriptionBar onOrderPress={handleOrderPress} />
 
-          {/* Buy Again Section */}
-          <BuyAgainHeader
-            onViewAll={handleViewAllBuyAgain}
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-          />
+              {/* Buy Again Section */}
+              <BuyAgainHeader
+                onViewAll={handleViewAllBuyAgain}
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+              />
 
-          {/* Medicine Cards Carousel */}
-          <MedicineCarousel
-            onAddToCart={handleAddToCart}
-            quantities={medicineQuantities}
-          />
+              {/* Medicine Cards Carousel */}
+              <MedicineCarousel
+                onAddToCart={handleAddToCart}
+                quantities={medicineQuantities}
+              />
 
-          {/* Bank Offers Auto Carousel */}
-          <BankOffersCarousel />
+              {/* Bank Offers Auto Carousel */}
+              <BankOffersCarousel />
 
-          {/* Curated Offerings */}
-          <CuratedOfferings />
+              {/* Curated Offerings */}
+              <CuratedOfferings />
 
-          {/* Promotion Banners Auto Carousel */}
-          <PromotionBanners />
+              {/* Promotion Banners Auto Carousel */}
+              <PromotionBanners />
 
-          {/* Content Cards */}
-          <ContentCards />
+              {/* Content Cards */}
+              <ContentCards />
 
-          {/* Ask Apollo Poster Carousel */}
-          <AskApolloCarousel />
+              {/* Ask Apollo Poster Carousel */}
+              <AskApolloCarousel />
 
-          {/* Trust Badges */}
-          <TrustBadges />
+              {/* Trust Badges */}
+              <TrustBadges />
 
-          {/* Footer */}
-          <Footer />
+              {/* Footer */}
+              <Footer />
+            </>
+          )}
 
           {/* Bottom Spacer for tab bar */}
           <View style={styles.bottomSpacer} />
