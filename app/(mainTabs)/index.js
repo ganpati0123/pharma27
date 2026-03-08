@@ -84,6 +84,13 @@ import HealthCheckScreen from '../components/healthcheck/HealthCheckScreen';
 import WomenScreen from '../components/women/WomenScreen';
 import MenScreen from '../components/men/MenScreen';
 
+// New Healthcare Category Screens
+import WeightLossScreen from '../components/weightloss/WeightLossScreen';
+import InstantDrScreen from '../components/instantdr/InstantDrScreen';
+import SexualHealthScreen from '../components/sexualhealth/SexualHealthScreen';
+import NutritionScreen from '../components/nutrition/NutritionScreen';
+import BabyScreen from '../components/baby/BabyScreen';
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -630,6 +637,31 @@ export default function HomeScreen() {
             /* MEN PAGE */
             /* ============================================ */
             <MenScreen scrollY={scrollY} />
+          ) : selectedCategory === 'weightloss' ? (
+            /* ============================================ */
+            /* WEIGHT LOSS PAGE (Emerald Edition) */
+            /* ============================================ */
+            <WeightLossScreen scrollY={scrollY} />
+          ) : selectedCategory === 'instantdr' ? (
+            /* ============================================ */
+            /* INSTANT DR PAGE (Medical Blue Edition) */
+            /* ============================================ */
+            <InstantDrScreen scrollY={scrollY} />
+          ) : selectedCategory === 'sexualhealth' ? (
+            /* ============================================ */
+            /* SEXUAL HEALTH PAGE (Rose Edition) */
+            /* ============================================ */
+            <SexualHealthScreen scrollY={scrollY} />
+          ) : selectedCategory === 'nutrition' ? (
+            /* ============================================ */
+            /* NUTRITION PAGE (Vitality Edition) */
+            /* ============================================ */
+            <NutritionScreen scrollY={scrollY} />
+          ) : selectedCategory === 'baby' ? (
+            /* ============================================ */
+            /* BABY PAGE (Sky Blue Edition) */
+            /* ============================================ */
+            <BabyScreen scrollY={scrollY} />
           ) : (
             /* ============================================ */
             /* HOME PAGE (Default) */

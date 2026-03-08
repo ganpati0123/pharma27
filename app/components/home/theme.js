@@ -678,6 +678,7 @@ export const DATA = {
     { id: 'nutrition', label: 'Nutrition', icon: 'nutrition-outline' },
     { id: 'instantdr', label: 'Instant Dr', icon: 'pulse-outline' },
     { id: 'sexualhealth', label: 'Sexual Health', icon: 'heart-outline' },
+    { id: 'baby', label: 'Baby', icon: 'happy-outline' },
   ],
 
   services: [
