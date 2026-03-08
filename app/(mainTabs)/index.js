@@ -77,6 +77,13 @@ import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, ANIMATION, LAYOUT, MIXINS
 // Skin Screen (Rose Gold Edition)
 import SkinScreen from '../components/skin/SkinScreen';
 
+// New Premium Section Screens
+import InsuranceScreen from '../components/insurance/InsuranceScreen';
+import SummerScreen from '../components/summer/SummerScreen';
+import HealthCheckScreen from '../components/healthcheck/HealthCheckScreen';
+import WomenScreen from '../components/women/WomenScreen';
+import MenScreen from '../components/men/MenScreen';
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -598,6 +605,31 @@ export default function HomeScreen() {
             /* SKIN PAGE (Rose Gold Edition) */
             /* ============================================ */
             <SkinScreen scrollY={scrollY} />
+          ) : selectedCategory === 'insurance' ? (
+            /* ============================================ */
+            /* INSURANCE PAGE */
+            /* ============================================ */
+            <InsuranceScreen scrollY={scrollY} />
+          ) : selectedCategory === 'summer' ? (
+            /* ============================================ */
+            /* SUMMER PAGE */
+            /* ============================================ */
+            <SummerScreen scrollY={scrollY} />
+          ) : selectedCategory === 'healthcheck' ? (
+            /* ============================================ */
+            /* HEALTH CHECK PAGE */
+            /* ============================================ */
+            <HealthCheckScreen scrollY={scrollY} />
+          ) : selectedCategory === 'women' ? (
+            /* ============================================ */
+            /* WOMEN PAGE */
+            /* ============================================ */
+            <WomenScreen scrollY={scrollY} />
+          ) : selectedCategory === 'men' ? (
+            /* ============================================ */
+            /* MEN PAGE */
+            /* ============================================ */
+            <MenScreen scrollY={scrollY} />
           ) : (
             /* ============================================ */
             /* HOME PAGE (Default) */
