@@ -1,4 +1,5 @@
 import { Tabs } from 'expo-router';
+import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
@@ -10,12 +11,24 @@ export default function LabTestsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          height: 70,
-          paddingBottom: 10,
-          paddingTop: 10,
+          height: 60,
+          paddingBottom: 6,
+          paddingTop: 6,
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 1,
+          borderTopColor: '#E0E0E0',
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
         },
-        tabBarActiveTintColor: '#9B59B6',
-        tabBarInactiveTintColor: '#8E8E93',
+        tabBarActiveTintColor: '#E05A2B',
+        tabBarInactiveTintColor: '#555555',
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '500',
+        },
       }}
     >
       <Tabs.Screen
@@ -23,7 +36,7 @@ export default function LabTestsLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => (
-            <Ionicons name="arrow-back" size={24} color={color} />
+            <Ionicons name="arrow-back" size={22} color={color} />
           ),
         }}
         listeners={{
@@ -37,8 +50,8 @@ export default function LabTestsLayout() {
         name="index"
         options={{
           title: 'Lab Tests',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="flask" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="flask-outline" size={22} color={color} />
           ),
         }}
       />
@@ -46,8 +59,8 @@ export default function LabTestsLayout() {
         name="fullbody"
         options={{
           title: 'Full Body',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="body" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="body-outline" size={22} color={color} />
           ),
         }}
       />
@@ -55,26 +68,29 @@ export default function LabTestsLayout() {
         name="categories"
         options={{
           title: 'Categories',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="grid" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="grid-outline" size={22} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="prohealth"
         options={{
-          title: 'Pro Health',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="fitness" size={size} color={color} />
+          title: 'Prohealth',
+          tabBarIcon: ({ color }) => (
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 9, fontWeight: '700', color: color, letterSpacing: 0.5 }}>PRO</Text>
+              <Text style={{ fontSize: 7, color: color, marginTop: -2 }}>HEALTH</Text>
+            </View>
           ),
         }}
       />
       <Tabs.Screen
         name="orders"
         options={{
-          title: 'Orders',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="document-text" size={size} color={color} />
+          title: 'My Orders',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="document-text-outline" size={22} color={color} />
           ),
         }}
       />
