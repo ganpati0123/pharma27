@@ -123,6 +123,18 @@ export default function InsuranceLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="health-insurance"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="topup-dedicated"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
