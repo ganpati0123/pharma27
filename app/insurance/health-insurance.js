@@ -11,6 +11,8 @@ import { useInsuranceStore, INSURANCE_PLANS, HOSPITALS, EXPERTS, INSURANCE_FAQS,
 import SectionHeader from '../components/insurance/shared/SectionHeader';
 import AnimatedCard from '../components/insurance/shared/AnimatedCard';
 import { SkeletonSection, SkeletonGrid, SkeletonPlanCard } from '../components/insurance/shared/SkeletonLoader';
+import FadeInSection from '../components/insurance/shared/FadeInSection';
+import useTheme from '../components/insurance/shared/useTheme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -74,6 +76,7 @@ const faqStyles = StyleSheet.create({
 export default function HealthInsurancePage() {
   const store = useInsuranceStore();
   const router = useRouter();
+  const { isDarkMode, colors } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPlanTab, setSelectedPlanTab] = useState('popular');
@@ -86,7 +89,11 @@ export default function HealthInsurancePage() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
+    setIsLoading(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      setIsLoading(false);
+    }, 1500);
   }, []);
 
   // ============== SECTION 1: PREMIUM HEADER ==============
@@ -868,9 +875,9 @@ export default function HealthInsurancePage() {
   // ============== SKELETON ==============
   if (isLoading) {
     return (
-      <View style={s.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />
-        <View style={{ backgroundColor: '#FF6B35', height: 240 }} />
+      <View style={[s.container, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#FF6B35'} />
+        <View style={{ backgroundColor: isDarkMode ? colors.surface : '#FF6B35', height: 240 }} />
         <View style={{ padding: 16 }}>
           <SkeletonSection />
           <SkeletonPlanCard />
@@ -882,8 +889,8 @@ export default function HealthInsurancePage() {
   }
 
   return (
-    <View style={s.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />
+    <View style={[s.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#FF6B35'} />
       <Animated.ScrollView
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
         scrollEventThrottle={16}
@@ -891,29 +898,29 @@ export default function HealthInsurancePage() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FF6B35" colors={['#FF6B35']} />}
       >
         {renderHeader()}
-        {renderPlansComparison()}
-        {renderCoverageDetails()}
-        {renderHospitalNetwork()}
-        {renderPreExisting()}
-        {renderMaternity()}
-        {renderRoomRent()}
-        {renderDayCare()}
-        {renderCoPayment()}
-        {renderNCB()}
-        {renderRestoration()}
-        {renderAmbulance()}
-        {renderHealthCheckups()}
-        {renderTelemedicine()}
-        {renderWellness()}
-        {renderDiseaseManagement()}
-        {renderClaimsHistory()}
-        {renderCalculator()}
-        {renderTaxBenefits()}
-        {renderRenewalReminders()}
-        {renderAddOns()}
-        {renderReviews()}
-        {renderSupport()}
-        {renderFAQ()}
+        <FadeInSection delay={100}>{renderPlansComparison()}</FadeInSection>
+        <FadeInSection delay={150}>{renderCoverageDetails()}</FadeInSection>
+        <FadeInSection delay={200}>{renderHospitalNetwork()}</FadeInSection>
+        <FadeInSection delay={250}>{renderPreExisting()}</FadeInSection>
+        <FadeInSection delay={300}>{renderMaternity()}</FadeInSection>
+        <FadeInSection delay={350}>{renderRoomRent()}</FadeInSection>
+        <FadeInSection delay={400}>{renderDayCare()}</FadeInSection>
+        <FadeInSection delay={450}>{renderCoPayment()}</FadeInSection>
+        <FadeInSection delay={500}>{renderNCB()}</FadeInSection>
+        <FadeInSection delay={550}>{renderRestoration()}</FadeInSection>
+        <FadeInSection delay={600}>{renderAmbulance()}</FadeInSection>
+        <FadeInSection delay={650}>{renderHealthCheckups()}</FadeInSection>
+        <FadeInSection delay={700}>{renderTelemedicine()}</FadeInSection>
+        <FadeInSection delay={750}>{renderWellness()}</FadeInSection>
+        <FadeInSection delay={800}>{renderDiseaseManagement()}</FadeInSection>
+        <FadeInSection delay={850}>{renderClaimsHistory()}</FadeInSection>
+        <FadeInSection delay={900}>{renderCalculator()}</FadeInSection>
+        <FadeInSection delay={950}>{renderTaxBenefits()}</FadeInSection>
+        <FadeInSection delay={1000}>{renderRenewalReminders()}</FadeInSection>
+        <FadeInSection delay={1050}>{renderAddOns()}</FadeInSection>
+        <FadeInSection delay={1100}>{renderReviews()}</FadeInSection>
+        <FadeInSection delay={1150}>{renderSupport()}</FadeInSection>
+        <FadeInSection delay={1200}>{renderFAQ()}</FadeInSection>
         {renderDisclaimers()}
         <View style={{ height: 20 }} />
       </Animated.ScrollView>

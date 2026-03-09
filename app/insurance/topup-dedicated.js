@@ -11,6 +11,8 @@ import { useInsuranceStore, TOPUP_PLANS, HOSPITALS, EXPERTS, INSURANCE_FAQS, REV
 import SectionHeader from '../components/insurance/shared/SectionHeader';
 import AnimatedCard from '../components/insurance/shared/AnimatedCard';
 import { SkeletonSection, SkeletonGrid, SkeletonPlanCard } from '../components/insurance/shared/SkeletonLoader';
+import FadeInSection from '../components/insurance/shared/FadeInSection';
+import useTheme from '../components/insurance/shared/useTheme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -69,13 +71,21 @@ const faqS = StyleSheet.create({
 export default function TopUpDedicatedPage() {
   const store = useInsuranceStore();
   const router = useRouter();
+  const { isDarkMode, colors } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedDeductible, setSelectedDeductible] = useState(300000);
   const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => { setTimeout(() => setIsLoading(false), 1000); }, []);
-  const onRefresh = useCallback(() => { setRefreshing(true); setTimeout(() => setRefreshing(false), 1500); }, []);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setIsLoading(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      setIsLoading(false);
+    }, 1500);
+  }, []);
 
   // ============== SECTION 1: HEADER ==============
   const renderHeader = () => (
@@ -704,17 +714,17 @@ export default function TopUpDedicatedPage() {
 
   if (isLoading) {
     return (
-      <View style={s.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#4CAF50" />
-        <View style={{ backgroundColor: '#4CAF50', height: 260 }} />
+      <View style={[s.container, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#4CAF50'} />
+        <View style={{ backgroundColor: isDarkMode ? colors.surface : '#4CAF50', height: 260 }} />
         <View style={{ padding: 16 }}><SkeletonSection /><SkeletonPlanCard /><SkeletonGrid /><SkeletonSection /></View>
       </View>
     );
   }
 
   return (
-    <View style={s.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#4CAF50" />
+    <View style={[s.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#4CAF50'} />
       <Animated.ScrollView
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
         scrollEventThrottle={16}
@@ -722,29 +732,29 @@ export default function TopUpDedicatedPage() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4CAF50" colors={['#4CAF50']} />}
       >
         {renderHeader()}
-        {renderBasePolicy()}
-        {renderCalculator()}
-        {renderCoverageIncrease()}
-        {renderNetworkHospitals()}
-        {renderDiseaseCoverage()}
-        {renderRoomRent()}
-        {renderICU()}
-        {renderDayCare()}
-        {renderCoPay()}
-        {renderNCB()}
-        {renderRestoration()}
-        {renderMaternity()}
-        {renderPreventive()}
-        {renderAlternative()}
-        {renderEmergency()}
-        {renderClaimsRatio()}
-        {renderEMI()}
-        {renderTax()}
-        {renderReviews()}
-        {renderCompare()}
-        {renderExperts()}
-        {renderFAQ()}
-        {renderSupport()}
+        <FadeInSection delay={100}>{renderBasePolicy()}</FadeInSection>
+        <FadeInSection delay={150}>{renderCalculator()}</FadeInSection>
+        <FadeInSection delay={200}>{renderCoverageIncrease()}</FadeInSection>
+        <FadeInSection delay={250}>{renderNetworkHospitals()}</FadeInSection>
+        <FadeInSection delay={300}>{renderDiseaseCoverage()}</FadeInSection>
+        <FadeInSection delay={350}>{renderRoomRent()}</FadeInSection>
+        <FadeInSection delay={400}>{renderICU()}</FadeInSection>
+        <FadeInSection delay={450}>{renderDayCare()}</FadeInSection>
+        <FadeInSection delay={500}>{renderCoPay()}</FadeInSection>
+        <FadeInSection delay={550}>{renderNCB()}</FadeInSection>
+        <FadeInSection delay={600}>{renderRestoration()}</FadeInSection>
+        <FadeInSection delay={650}>{renderMaternity()}</FadeInSection>
+        <FadeInSection delay={700}>{renderPreventive()}</FadeInSection>
+        <FadeInSection delay={750}>{renderAlternative()}</FadeInSection>
+        <FadeInSection delay={800}>{renderEmergency()}</FadeInSection>
+        <FadeInSection delay={850}>{renderClaimsRatio()}</FadeInSection>
+        <FadeInSection delay={900}>{renderEMI()}</FadeInSection>
+        <FadeInSection delay={950}>{renderTax()}</FadeInSection>
+        <FadeInSection delay={1000}>{renderReviews()}</FadeInSection>
+        <FadeInSection delay={1050}>{renderCompare()}</FadeInSection>
+        <FadeInSection delay={1100}>{renderExperts()}</FadeInSection>
+        <FadeInSection delay={1150}>{renderFAQ()}</FadeInSection>
+        <FadeInSection delay={1200}>{renderSupport()}</FadeInSection>
         {renderFooter()}
         <View style={{ height: 20 }} />
       </Animated.ScrollView>

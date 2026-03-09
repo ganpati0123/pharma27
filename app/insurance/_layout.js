@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { View, StyleSheet, Animated } from 'react-native';
 import { useRef, useEffect } from 'react';
+import useTheme from '../components/insurance/shared/useTheme';
 
 const TabIcon = ({ name, color, size, focused }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -36,6 +37,7 @@ const TabIcon = ({ name, color, size, focused }) => {
 
 export default function InsuranceLayout() {
   const router = useRouter();
+  const { colors, isDarkMode } = useTheme();
 
   return (
     <Tabs
@@ -45,17 +47,17 @@ export default function InsuranceLayout() {
           height: 72,
           paddingBottom: 8,
           paddingTop: 8,
-          backgroundColor: '#FFFFFF',
+          backgroundColor: colors.tabBar,
           borderTopWidth: 1,
-          borderTopColor: '#F0F0F0',
+          borderTopColor: isDarkMode ? colors.border : '#F0F0F0',
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -4 },
           shadowOpacity: 0.06,
           shadowRadius: 12,
           elevation: 12,
         },
-        tabBarActiveTintColor: '#FF6B35',
-        tabBarInactiveTintColor: '#8E8E93',
+        tabBarActiveTintColor: colors.tabBarActive,
+        tabBarInactiveTintColor: colors.tabBarInactive,
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
@@ -153,6 +155,9 @@ const tabStyles = StyleSheet.create({
   },
   iconBgActive: {
     backgroundColor: '#FFF3E0',
+  },
+  iconBgActiveDark: {
+    backgroundColor: '#3D2E1F',
   },
   activeDot: {
     width: 4,

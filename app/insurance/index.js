@@ -7,10 +7,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useInsuranceStore, INSURANCE_CATEGORIES, SPECIAL_OFFERS, EXPERTS, INSURANCE_FAQS, REVIEWS, WELLNESS_PROGRAMS, INSURANCE_PLANS } from '../components/insurance/store';
+import { useInsuranceStore, INSURANCE_CATEGORIES, SPECIAL_OFFERS, EXPERTS, INSURANCE_FAQS, REVIEWS, WELLNESS_PROGRAMS, INSURANCE_PLANS, THEME } from '../components/insurance/store';
 import SectionHeader from '../components/insurance/shared/SectionHeader';
 import AnimatedCard from '../components/insurance/shared/AnimatedCard';
 import { SkeletonPlanCard, SkeletonSection, SkeletonGrid } from '../components/insurance/shared/SkeletonLoader';
+import FadeInSection from '../components/insurance/shared/FadeInSection';
+import useTheme from '../components/insurance/shared/useTheme';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -150,6 +152,7 @@ const faqStyles = StyleSheet.create({
 export default function InsuranceIndex() {
   const router = useRouter();
   const store = useInsuranceStore();
+  const { isDarkMode, colors } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -162,7 +165,11 @@ export default function InsuranceIndex() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
+    setIsLoading(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      setIsLoading(false);
+    }, 1500);
   }, []);
 
   const headerOpacity = scrollY.interpolate({ inputRange: [0, 150], outputRange: [1, 0.8], extrapolate: 'clamp' });
@@ -201,20 +208,20 @@ export default function InsuranceIndex() {
 
           {/* Health Insurance & Top-Up Buttons */}
           <View style={styles.mainButtons}>
-            <TouchableOpacity style={styles.mainBtn} activeOpacity={0.85}>
-              <LinearGradient colors={['#FFFFFF', '#FFF8F0']} style={styles.mainBtnGradient}>
+            <TouchableOpacity style={styles.mainBtn} activeOpacity={0.85} onPress={() => router.push('/insurance/health-insurance')}>
+              <LinearGradient colors={isDarkMode ? [colors.surface, colors.surfaceVariant] : ['#FFFFFF', '#FFF8F0']} style={styles.mainBtnGradient}>
                 <View style={styles.mainBtnIcon}>
-                  <Ionicons name="heart" size={24} color="#FF6B35" />
+                  <Ionicons name="heart" size={24} color={colors.primary} />
                 </View>
-                <Text style={styles.mainBtnTitle}>Health{'\n'}Insurance</Text>
+                <Text style={[styles.mainBtnTitle, { color: colors.text }]}>Health{'\n'}Insurance</Text>
               </LinearGradient>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.mainBtn} activeOpacity={0.85}>
-              <LinearGradient colors={['#FFFFFF', '#F0FFF4']} style={styles.mainBtnGradient}>
-                <View style={[styles.mainBtnIcon, { backgroundColor: '#E8F5E9' }]}>
-                  <Ionicons name="trending-up" size={24} color="#2ECC71" />
+            <TouchableOpacity style={styles.mainBtn} activeOpacity={0.85} onPress={() => router.push('/insurance/topup-dedicated')}>
+              <LinearGradient colors={isDarkMode ? [colors.surface, colors.surfaceVariant] : ['#FFFFFF', '#F0FFF4']} style={styles.mainBtnGradient}>
+                <View style={[styles.mainBtnIcon, { backgroundColor: isDarkMode ? '#1B3D20' : '#E8F5E9' }]}>
+                  <Ionicons name="trending-up" size={24} color={colors.secondary} />
                 </View>
-                <Text style={styles.mainBtnTitle}>Super{'\n'}Top-Up</Text>
+                <Text style={[styles.mainBtnTitle, { color: colors.text }]}>Super{'\n'}Top-Up</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -805,9 +812,9 @@ export default function InsuranceIndex() {
   // ============== SKELETON LOADING ==============
   if (isLoading) {
     return (
-      <View style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />
-        <View style={{ backgroundColor: '#FF6B35', height: 200 }} />
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#FF6B35'} />
+        <View style={{ backgroundColor: isDarkMode ? colors.surface : '#FF6B35', height: 200 }} />
         <View style={{ padding: 16 }}>
           <SkeletonSection />
           <SkeletonGrid />
@@ -819,8 +826,8 @@ export default function InsuranceIndex() {
   }
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#FF6B35'} />
       <Animated.ScrollView
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
         scrollEventThrottle={16}
@@ -828,24 +835,24 @@ export default function InsuranceIndex() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FF6B35" colors={['#FF6B35']} />}
       >
         {renderHeader()}
-        {renderPlanFinder()}
-        {renderTopUpCTA()}
-        {renderWhyBuyFromUs()}
-        {renderCoverage()}
-        {renderEcosystem()}
-        {renderNetworkHospitals()}
-        {renderTips()}
-        {renderAdvisor()}
-        {renderCategories()}
-        {renderSpecialOffers()}
-        {renderCalculator()}
-        {renderQuickClaim()}
-        {renderExperts()}
-        {renderWellness()}
-        {renderReviews()}
-        {renderRecentActivities()}
-        {renderFAQ()}
-        {renderTerms()}
+        <FadeInSection delay={100}>{renderPlanFinder()}</FadeInSection>
+        <FadeInSection delay={200}>{renderTopUpCTA()}</FadeInSection>
+        <FadeInSection delay={250}>{renderWhyBuyFromUs()}</FadeInSection>
+        <FadeInSection delay={300}>{renderCoverage()}</FadeInSection>
+        <FadeInSection delay={350}>{renderEcosystem()}</FadeInSection>
+        <FadeInSection delay={400}>{renderNetworkHospitals()}</FadeInSection>
+        <FadeInSection delay={450}>{renderTips()}</FadeInSection>
+        <FadeInSection delay={500}>{renderAdvisor()}</FadeInSection>
+        <FadeInSection delay={550}>{renderCategories()}</FadeInSection>
+        <FadeInSection delay={600}>{renderSpecialOffers()}</FadeInSection>
+        <FadeInSection delay={650}>{renderCalculator()}</FadeInSection>
+        <FadeInSection delay={700}>{renderQuickClaim()}</FadeInSection>
+        <FadeInSection delay={750}>{renderExperts()}</FadeInSection>
+        <FadeInSection delay={800}>{renderWellness()}</FadeInSection>
+        <FadeInSection delay={850}>{renderReviews()}</FadeInSection>
+        <FadeInSection delay={900}>{renderRecentActivities()}</FadeInSection>
+        <FadeInSection delay={950}>{renderFAQ()}</FadeInSection>
+        <FadeInSection delay={1000}>{renderTerms()}</FadeInSection>
         {renderFooter()}
         <View style={{ height: 20 }} />
       </Animated.ScrollView>
