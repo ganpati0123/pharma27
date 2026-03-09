@@ -1,118 +1,52 @@
-# Testing Pharma27 React Native App
+# Testing Pharma27 Expo App
 
 ## Overview
-Pharma27 is an Expo-based React Native healthcare super-app (Apollo 24/7 clone) with tab navigation, animated carousels, and a modular Home screen.
+Pharma27 is a React Native + Expo healthcare super-app (Apollo 24|7 clone). It uses expo-router for file-based routing with nested tab navigators.
 
-## Environment Setup
+## Running Locally
 
-### Dependencies
-```bash
-npm install
-```
+1. Install dependencies: `npm install` (from repo root)
+2. Start Expo web server: `npx expo start --web --port 8081`
+   - Port 8081 may be in use; accept the prompt to use an alternate port (e.g., 8082)
+   - The server runs as a foreground process - use a background shell
+3. Open `http://localhost:<port>` in Chrome
+4. The app loads to the Home screen with bottom tab navigation
 
-### Web Platform (required for browser testing)
-The project may not include web deps by default. If `npx expo start --web` fails with missing `react-native-web`:
-```bash
-npx expo install react-native-web react-dom @expo/metro-runtime
-```
+## App Structure
 
-### Start Dev Server
+- **Main tabs** (`app/(mainTabs)/`): Home, Doctors, Pharmacy, Lab Tests, Insurance, My Health
+- **Doctors sub-tabs** (`app/doctors/`): Doctors (index), Online, Surgery, On-Time, Assistant
+  - Each sub-tab has its own bottom tab bar within the Doctors section
+  - The "Home" tab in the Doctors sub-nav navigates back to the main Home screen
 
-#### Browser Testing
-```bash
-npx expo start --web --port 8081
-```
-The app will be available at `http://localhost:8081`.
+## Testing Navigation
 
-#### Mobile Device Testing (Expo Go)
-```bash
-npx expo start --tunnel
-```
-- First run will prompt to install `@expo/ngrok@^4.1.0` globally — answer Y
-- Once tunnel is ready, a QR code and `exp://` URL will be displayed
-- Scan QR code with Expo Go (Android) or Camera app (iOS)
-- Web version is also available at `http://localhost:8081` simultaneously
+- Click "Doctors" in the main bottom tab bar to enter the Doctors section
+- The Doctors section has its own nested bottom tabs: Home (back), Doctors, Online, Surgery, On-Time, Assistant
+- Active tab is highlighted in Apollo Orange (#E05A2B)
+- Scrollable screens (Doctors, Surgery) show a "Go To Top" button after scrolling ~500px
+- Floating "Ask Apollo" bubble appears on most screens with a bobbing animation
 
-**Note:** Initial bundle takes ~20s. The page may appear partially loaded while animations initialize — wait 2-3 seconds for full render.
+## Key Testing Points
 
-## Project Structure
-- `app/(mainTabs)/index.js` — Main Home screen (~960 lines)
-- `app/(mainTabs)/_layout.js` — Tab bar layout (6 tabs)
-- `app/(mainTabs)/BuyAgainScreen.js` — Buy Again detail screen
-- `app/cart.js` — Cart screen (~1013 lines) with quantity controls, price breakdown
-- `app/account.js` — Account/profile screen (~919 lines) with menu, orders, settings
-- `app/components/home/theme.js` — Design system tokens
-- `app/components/home/HeroAndServices.js` — Hero, services grid, prescription bar
-- `app/components/home/ShoppingSection.js` — Buy Again, medicine carousel, bank offers
-- `app/components/home/DiscoverSection.js` — Curated offerings, content cards, Ask Apollo, trust badges, footer
-- `app/{doctors,pharmacy,labtests,insurance,myhealth}/index.js` — Placeholder tab screens
+- **Search bar animation**: The search bar placeholder text rotates every 3 seconds with a fade transition
+- **Surgery hero text**: Cycles between "Expert Surgeons", "World-Class Hospitals", "Advanced Technology"
+- **Floating bubble**: Should have a continuous bobbing animation (translateY)
+- **Tab switching**: All 5 sub-tabs should render without crashes
+- **Scroll performance**: Uses scrollEventThrottle={16} for smooth scroll tracking
 
-## Key Test Flows
+## Build Verification
 
-### 1. Home Screen Full Render
-- Load `http://localhost:8081`
-- Verify 14 sections render: Header, Search bar, Category nav, Hero, Services grid, Prescription banner, Buy Again, Medicine cards, Bank offers carousel, Curated offerings, Promotion banners, Content cards, Ask Apollo carousel, Trust badges, Footer
-- Verify exactly 6 tabs at bottom: Home, Doctors, Pharmacy, Lab Tests, Insurance, My Health
+- Run `npx expo export --platform web` to verify the build compiles without errors
+- No CI checks are configured on this repo currently
 
-### 2. Add to Cart (Medicine Interaction)
-- Scroll to Buy Again section
-- Click green "Add" button on any medicine card
-- Verify: button changes to quantity counter (- N +), cart badge in header updates
-- Click "+" to increment — counter and badge should both update
-- Add a second medicine — badge should reflect total count across all medicines
+## Known Considerations
 
-### 3. Cart Page
-- Click cart icon (top-right, next to search bar) to navigate to `/cart`
-- Verify "My Cart" header with item count badge
-- Verify 3 pre-loaded items: Dolo 650 (₹84), Augmentin 625 (₹228), Cetrizine 10mg (₹18)
-- Test quantity increment: click "+" on any item, verify price updates (e.g. Augmentin ₹228 → ₹456 at qty 2)
-- Verify delivery fee logic: FREE when subtotal > ₹500, otherwise ₹49
-- Verify Price Details section: Subtotal, Discount, Delivery Fee, Total
-- Verify "Proceed to Checkout" button at bottom
-- Click back arrow (top-left) to return to Home — cart state should be preserved
-
-### 4. Account Page
-- Click profile avatar (top-right, gold-bordered person icon) to navigate to `/account`
-- Verify "My Account" header with green gradient profile card
-- Verify profile info: Guest User, +91 98765 43210, guest@apollo247.com
-- Verify all 10 menu items: My Orders, My Prescriptions, Health Records, Appointments, Subscriptions, Insurance, Saved Addresses, Payment Methods, Notifications, Help & Support
-- Verify Logout button at bottom (red text)
-- Click "My Orders" — verify Order History with 3 sample orders (Delivered/Cancelled statuses, Reorder buttons)
-- Click back to menu, click "Edit Profile" — verify Profile Settings form (Name, Phone, Email, Address fields + Save Changes button)
-- Navigate back to Home
-
-### 5. View All → BuyAgainScreen → Back
-- Click "View All >" in Buy Again section header
-- Verify BuyAgainScreen loads at `/BuyAgainScreen`
-- Click back chevron (top-left) — should return to Home with cart state preserved
-
-### 6. Tab Navigation
-- Click any tab (e.g., Doctors) — should navigate to placeholder screen
-- Click Home tab — should return to Home screen
-
-### 7. Auto-Scrolling Carousels
-- Bank Offers carousel auto-scrolls through bank cards
-- Ask Apollo poster carousel auto-scrolls through health topics
-- Both should scroll smoothly without glitches
-
-## Navigation Paths (from code)
-- Home → Cart: Click cart icon in SearchBarRow (index.js line 574, `router.push('/cart')`)
-- Home → Account: Click profile avatar in StickyHeader (index.js line 571, `router.push('/account')`)
-- Cart → Home: Back arrow (cart.js, `router.back()`)
-- Account → Home: Back arrow (account.js, `router.back()`)
-- Account → Orders: Tap "My Orders" menu item (sets `activeSection` to `'orders'`)
-- Account → Settings: Tap "Edit Profile" button (sets `activeSection` to `'settings'`)
-
-## Known Patterns & Gotchas
-- Tab entry files (e.g., `doctors-entry.js`) use `router.push()` in `useEffect` to redirect tabs to stack screens — this is a fragile pattern that may cause flicker on slower devices
-- `BuyAgainScreen.js` lives in `(mainTabs)/` but is hidden from the tab bar via `href: null` in the layout
-- No lint/typecheck/CI scripts are configured in this project
-- The app uses `react-native-reanimated` v4 worklets extensively — the babel plugin is auto-included via `babel-preset-expo`
-- All components use `React.memo` with `useCallback`/`useMemo` for performance
-- Cart screen has pre-loaded sample items (Dolo 650, Augmentin 625, Cetrizine 10mg) regardless of what's added from Home
-- Account page uses internal state (`activeSection`) to switch between menu/orders/settings views rather than separate routes
-- Some package version mismatches may show warnings at startup (e.g. async-storage, expo-linear-gradient, gesture-handler, reanimated) but these don't block functionality
-- When using tunnel mode, ngrok package is installed globally on first use
+- All icons use emoji placeholders rather than custom image assets
+- All data is mock/hardcoded in `DoctorsTheme.js` - no real API calls
+- Files use `.js` extension (not `.ts`) following existing repo convention
+- Package version warnings may appear on startup but don't affect functionality
 
 ## Devin Secrets Needed
-None — this is a purely frontend app with no auth or API keys required.
+
+None - this is a local-only Expo app with no authentication or API keys required.
