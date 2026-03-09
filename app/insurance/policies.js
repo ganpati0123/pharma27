@@ -10,6 +10,8 @@ import { useInsuranceStore } from '../components/insurance/store';
 import SectionHeader from '../components/insurance/shared/SectionHeader';
 import AnimatedCard from '../components/insurance/shared/AnimatedCard';
 import { SkeletonSection, SkeletonPlanCard } from '../components/insurance/shared/SkeletonLoader';
+import FadeInSection from '../components/insurance/shared/FadeInSection';
+import useTheme from '../components/insurance/shared/useTheme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -28,6 +30,7 @@ const ProgressBar = ({ progress, color = '#FF6B35', height = 6 }) => {
 
 export default function Policies() {
   const store = useInsuranceStore();
+  const { isDarkMode, colors } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('active');
@@ -39,7 +42,11 @@ export default function Policies() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
+    setIsLoading(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      setIsLoading(false);
+    }, 1500);
   }, []);
 
   // ============== SECTION 1: HEADER ==============
@@ -527,9 +534,9 @@ export default function Policies() {
   // ============== SKELETON ==============
   if (isLoading) {
     return (
-      <View style={s.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />
-        <View style={{ backgroundColor: '#FF6B35', height: 200 }} />
+      <View style={[s.container, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#FF6B35'} />
+        <View style={{ backgroundColor: isDarkMode ? colors.surface : '#FF6B35', height: 200 }} />
         <View style={{ padding: 16 }}>
           <SkeletonSection />
           <SkeletonPlanCard />
@@ -540,8 +547,8 @@ export default function Policies() {
   }
 
   return (
-    <View style={s.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />
+    <View style={[s.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#FF6B35'} />
       <Animated.ScrollView
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
         scrollEventThrottle={16}
@@ -549,19 +556,19 @@ export default function Policies() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FF6B35" colors={['#FF6B35']} />}
       >
         {renderHeader()}
-        {renderActivePolicies()}
-        {renderExpiredPolicies()}
-        {renderClaimsHistory()}
-        {renderPremiumPayments()}
-        {renderDocuments()}
-        {renderNominee()}
-        {renderCoverageSummary()}
-        {renderRenewals()}
-        {renderComparison()}
-        {renderFamilyCoverage()}
-        {renderBeneficiary()}
-        {renderPolicyStatus()}
-        {renderSupport()}
+        <FadeInSection delay={100}>{renderActivePolicies()}</FadeInSection>
+        <FadeInSection delay={150}>{renderExpiredPolicies()}</FadeInSection>
+        <FadeInSection delay={200}>{renderClaimsHistory()}</FadeInSection>
+        <FadeInSection delay={250}>{renderPremiumPayments()}</FadeInSection>
+        <FadeInSection delay={300}>{renderDocuments()}</FadeInSection>
+        <FadeInSection delay={350}>{renderNominee()}</FadeInSection>
+        <FadeInSection delay={400}>{renderCoverageSummary()}</FadeInSection>
+        <FadeInSection delay={450}>{renderRenewals()}</FadeInSection>
+        <FadeInSection delay={500}>{renderComparison()}</FadeInSection>
+        <FadeInSection delay={550}>{renderFamilyCoverage()}</FadeInSection>
+        <FadeInSection delay={600}>{renderBeneficiary()}</FadeInSection>
+        <FadeInSection delay={650}>{renderPolicyStatus()}</FadeInSection>
+        <FadeInSection delay={700}>{renderSupport()}</FadeInSection>
         <View style={{ height: 20 }} />
       </Animated.ScrollView>
     </View>

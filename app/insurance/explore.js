@@ -10,6 +10,8 @@ import { useInsuranceStore, INSURANCE_PLANS, INSURANCE_CATEGORIES, SPECIAL_OFFER
 import SectionHeader from '../components/insurance/shared/SectionHeader';
 import AnimatedCard from '../components/insurance/shared/AnimatedCard';
 import { SkeletonSection, SkeletonGrid } from '../components/insurance/shared/SkeletonLoader';
+import FadeInSection from '../components/insurance/shared/FadeInSection';
+import useTheme from '../components/insurance/shared/useTheme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -24,6 +26,7 @@ const StarRating = ({ rating, size = 14, color = '#FFB800' }) => (
 
 export default function Explore() {
   const store = useInsuranceStore();
+  const { isDarkMode, colors } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,7 +38,11 @@ export default function Explore() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
+    setIsLoading(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      setIsLoading(false);
+    }, 1500);
   }, []);
 
   // ============== SECTION 1: DISCOVER HEADER ==============
@@ -437,9 +444,9 @@ export default function Explore() {
   // ============== SKELETON ==============
   if (isLoading) {
     return (
-      <View style={s.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#3498DB" />
-        <View style={{ backgroundColor: '#3498DB', height: 180 }} />
+      <View style={[s.container, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#3498DB'} />
+        <View style={{ backgroundColor: isDarkMode ? colors.surface : '#3498DB', height: 180 }} />
         <View style={{ padding: 16 }}>
           <SkeletonSection />
           <SkeletonGrid />
@@ -450,8 +457,8 @@ export default function Explore() {
   }
 
   return (
-    <View style={s.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#3498DB" />
+    <View style={[s.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#3498DB'} />
       <Animated.ScrollView
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
         scrollEventThrottle={16}
@@ -459,19 +466,19 @@ export default function Explore() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#3498DB" colors={['#3498DB']} />}
       >
         {renderHeader()}
-        {renderTrending()}
-        {renderNewLaunches()}
-        {renderCategoryExplorer()}
-        {renderPriceDrops()}
-        {renderMostClaimed()}
-        {renderBestSellers()}
-        {renderExpertPicks()}
-        {renderSeasonalOffers()}
-        {renderCombos()}
-        {renderFavorites()}
-        {renderRecentlyViewed()}
-        {renderTrendingSearches()}
-        {renderDiscoverMore()}
+        <FadeInSection delay={100}>{renderTrending()}</FadeInSection>
+        <FadeInSection delay={150}>{renderNewLaunches()}</FadeInSection>
+        <FadeInSection delay={200}>{renderCategoryExplorer()}</FadeInSection>
+        <FadeInSection delay={250}>{renderPriceDrops()}</FadeInSection>
+        <FadeInSection delay={300}>{renderMostClaimed()}</FadeInSection>
+        <FadeInSection delay={350}>{renderBestSellers()}</FadeInSection>
+        <FadeInSection delay={400}>{renderExpertPicks()}</FadeInSection>
+        <FadeInSection delay={450}>{renderSeasonalOffers()}</FadeInSection>
+        <FadeInSection delay={500}>{renderCombos()}</FadeInSection>
+        <FadeInSection delay={550}>{renderFavorites()}</FadeInSection>
+        <FadeInSection delay={600}>{renderRecentlyViewed()}</FadeInSection>
+        <FadeInSection delay={650}>{renderTrendingSearches()}</FadeInSection>
+        <FadeInSection delay={700}>{renderDiscoverMore()}</FadeInSection>
         {renderFooter()}
         <View style={{ height: 20 }} />
       </Animated.ScrollView>

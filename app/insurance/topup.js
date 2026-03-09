@@ -11,6 +11,8 @@ import SectionHeader from '../components/insurance/shared/SectionHeader';
 import AnimatedCard from '../components/insurance/shared/AnimatedCard';
 import PlanCard from '../components/insurance/shared/PlanCard';
 import { SkeletonPlanCard, SkeletonSection } from '../components/insurance/shared/SkeletonLoader';
+import FadeInSection from '../components/insurance/shared/FadeInSection';
+import useTheme from '../components/insurance/shared/useTheme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -40,6 +42,7 @@ const StarRating = ({ rating, size = 14, color = '#FFB800' }) => (
 
 export default function Topup() {
   const store = useInsuranceStore();
+  const { isDarkMode, colors } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -50,7 +53,11 @@ export default function Topup() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
+    setIsLoading(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      setIsLoading(false);
+    }, 1500);
   }, []);
 
   // ============== SECTION 1: HEADER ==============
@@ -725,9 +732,9 @@ export default function Topup() {
   // ============== SKELETON ==============
   if (isLoading) {
     return (
-      <View style={s.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#4CAF50" />
-        <View style={{ backgroundColor: '#4CAF50', height: 200 }} />
+      <View style={[s.container, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#4CAF50'} />
+        <View style={{ backgroundColor: isDarkMode ? colors.surface : '#4CAF50', height: 200 }} />
         <View style={{ padding: 16 }}>
           <SkeletonSection />
           <SkeletonPlanCard />
@@ -738,8 +745,8 @@ export default function Topup() {
   }
 
   return (
-    <View style={s.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#4CAF50" />
+    <View style={[s.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#4CAF50'} />
       <Animated.ScrollView
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
         scrollEventThrottle={16}
@@ -747,29 +754,29 @@ export default function Topup() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4CAF50" colors={['#4CAF50']} />}
       >
         {renderHeader()}
-        {renderCheckPremium()}
-        {renderPlanIncluded()}
-        {renderKeyBenefits()}
-        {renderWhyBuy()}
-        {renderHowToBuy()}
-        {renderWhoShouldBuy()}
-        {renderComparison()}
-        {renderEcosystem()}
-        {renderTopupPlans()}
-        {renderHospitals()}
-        {renderDeductibleCalc()}
-        {renderDiseaseCoverage()}
-        {renderCopayment()}
-        {renderNCB()}
-        {renderRestoration()}
-        {renderEMI()}
-        {renderTaxSavings()}
-        {renderClaimRatio()}
-        {renderReviews()}
-        {renderExpertPicks()}
-        {renderFAQ()}
-        {renderBrochure()}
-        {renderSupport()}
+        <FadeInSection delay={100}>{renderCheckPremium()}</FadeInSection>
+        <FadeInSection delay={150}>{renderPlanIncluded()}</FadeInSection>
+        <FadeInSection delay={200}>{renderKeyBenefits()}</FadeInSection>
+        <FadeInSection delay={250}>{renderWhyBuy()}</FadeInSection>
+        <FadeInSection delay={300}>{renderHowToBuy()}</FadeInSection>
+        <FadeInSection delay={350}>{renderWhoShouldBuy()}</FadeInSection>
+        <FadeInSection delay={400}>{renderComparison()}</FadeInSection>
+        <FadeInSection delay={450}>{renderEcosystem()}</FadeInSection>
+        <FadeInSection delay={500}>{renderTopupPlans()}</FadeInSection>
+        <FadeInSection delay={550}>{renderHospitals()}</FadeInSection>
+        <FadeInSection delay={600}>{renderDeductibleCalc()}</FadeInSection>
+        <FadeInSection delay={650}>{renderDiseaseCoverage()}</FadeInSection>
+        <FadeInSection delay={700}>{renderCopayment()}</FadeInSection>
+        <FadeInSection delay={750}>{renderNCB()}</FadeInSection>
+        <FadeInSection delay={800}>{renderRestoration()}</FadeInSection>
+        <FadeInSection delay={850}>{renderEMI()}</FadeInSection>
+        <FadeInSection delay={900}>{renderTaxSavings()}</FadeInSection>
+        <FadeInSection delay={950}>{renderClaimRatio()}</FadeInSection>
+        <FadeInSection delay={1000}>{renderReviews()}</FadeInSection>
+        <FadeInSection delay={1050}>{renderExpertPicks()}</FadeInSection>
+        <FadeInSection delay={1100}>{renderFAQ()}</FadeInSection>
+        <FadeInSection delay={1150}>{renderBrochure()}</FadeInSection>
+        <FadeInSection delay={1200}>{renderSupport()}</FadeInSection>
         {renderFooter()}
         <View style={{ height: 20 }} />
       </Animated.ScrollView>

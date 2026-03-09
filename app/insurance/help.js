@@ -10,6 +10,8 @@ import { useInsuranceStore, INSURANCE_FAQS } from '../components/insurance/store
 import SectionHeader from '../components/insurance/shared/SectionHeader';
 import AnimatedCard from '../components/insurance/shared/AnimatedCard';
 import { SkeletonSection } from '../components/insurance/shared/SkeletonLoader';
+import FadeInSection from '../components/insurance/shared/FadeInSection';
+import useTheme from '../components/insurance/shared/useTheme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -54,6 +56,7 @@ const faqS = StyleSheet.create({
 
 export default function Help() {
   const store = useInsuranceStore();
+  const { isDarkMode, colors } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,7 +68,11 @@ export default function Help() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
+    setIsLoading(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      setIsLoading(false);
+    }, 1500);
   }, []);
 
   // ============== SECTION 1: HEADER ==============
@@ -505,9 +512,9 @@ export default function Help() {
   // ============== SKELETON ==============
   if (isLoading) {
     return (
-      <View style={s.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#9B59B6" />
-        <View style={{ backgroundColor: '#9B59B6', height: 200 }} />
+      <View style={[s.container, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#9B59B6'} />
+        <View style={{ backgroundColor: isDarkMode ? colors.surface : '#9B59B6', height: 200 }} />
         <View style={{ padding: 16 }}>
           <SkeletonSection />
           <SkeletonSection />
@@ -518,8 +525,8 @@ export default function Help() {
   }
 
   return (
-    <View style={s.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#9B59B6" />
+    <View style={[s.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? colors.background : '#9B59B6'} />
       <Animated.ScrollView
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
         scrollEventThrottle={16}
@@ -527,20 +534,20 @@ export default function Help() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#9B59B6" colors={['#9B59B6']} />}
       >
         {renderHeader()}
-        {renderFAQCategories()}
-        {renderClaimProcess()}
-        {renderPolicyUnderstanding()}
-        {renderContactUs()}
-        {renderTroubleshooting()}
-        {renderFeedback()}
-        {renderCommunity()}
-        {renderVideoGuides()}
-        {renderDocUpload()}
-        {renderAccountMgmt()}
-        {renderLegal()}
-        {renderSystemReq()}
-        {renderAboutUs()}
-        {renderMostViewedFAQ()}
+        <FadeInSection delay={100}>{renderFAQCategories()}</FadeInSection>
+        <FadeInSection delay={150}>{renderClaimProcess()}</FadeInSection>
+        <FadeInSection delay={200}>{renderPolicyUnderstanding()}</FadeInSection>
+        <FadeInSection delay={250}>{renderContactUs()}</FadeInSection>
+        <FadeInSection delay={300}>{renderTroubleshooting()}</FadeInSection>
+        <FadeInSection delay={350}>{renderFeedback()}</FadeInSection>
+        <FadeInSection delay={400}>{renderCommunity()}</FadeInSection>
+        <FadeInSection delay={450}>{renderVideoGuides()}</FadeInSection>
+        <FadeInSection delay={500}>{renderDocUpload()}</FadeInSection>
+        <FadeInSection delay={550}>{renderAccountMgmt()}</FadeInSection>
+        <FadeInSection delay={600}>{renderLegal()}</FadeInSection>
+        <FadeInSection delay={650}>{renderSystemReq()}</FadeInSection>
+        <FadeInSection delay={700}>{renderAboutUs()}</FadeInSection>
+        <FadeInSection delay={750}>{renderMostViewedFAQ()}</FadeInSection>
         <View style={{ height: 20 }} />
       </Animated.ScrollView>
     </View>
