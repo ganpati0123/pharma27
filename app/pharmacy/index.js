@@ -1121,7 +1121,17 @@ export default function PharmacyIndex() {
         <Skincare50Section />
         <ValueDealsSection />
         <PharmaciesNearSection />
-        <LiveHealthyFooter />
+        <MedicineCategoriesSection />
+        <PopularMedicinesSection />
+        <AyurvedicSection />
+        <SupplementsSection />
+        <BabyCareSection />
+        <PersonalCareSection />
+        <MedicalDevicesSection />
+        <SexualWellnessSection />
+        <TopBrandsSection />
+        <SpecialDealsSection />
+        <HealthConcernsExtendedSection />
         <PharmacyFAQsSection />
         <AppDownloadBanner />
         <TrustBadgesPharmacy />

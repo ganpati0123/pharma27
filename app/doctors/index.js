@@ -2081,20 +2081,6 @@ export default function DoctorsIndex() {
         <FAQSection />
         <AppDownloadSection />
         
-        {/* ───────────────────────────────────────────────────────────────────────────── */}
-        {/* ADDITIONAL PAGE 5: DOCTOR CONSULTATION PROCESS & MORE */}
-        {/* ───────────────────────────────────────────────────────────────────────────── */}
-        <ConsultationProcessSection />
-        <ConditionSpecialistsSection />
-        <AvailabilitySection />
-        <VideoFeaturesSection />
-        <InsurancePartnersSection />
-        <CorporateSection />
-        <EmergencySection />
-        <HealthTipsSection />
-        <ExtraFAQSection />
-        <TrustBadgesSection />
-        
         <View style={{ height: 40 }} />
       </ScrollView>
 
