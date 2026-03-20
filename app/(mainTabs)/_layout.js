@@ -69,6 +69,12 @@ export default function MainTabsLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="BuyAgainScreen"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
