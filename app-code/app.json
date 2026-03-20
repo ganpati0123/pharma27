@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Pharma 27",
+    "slug": "pharma-27",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "pharma27",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pharma27.app"
+    },
+    "android": {
+      "package": "com.pharma27.app"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
